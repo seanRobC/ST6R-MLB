@@ -23,6 +23,9 @@
       <height>711</height>
      </rect>
     </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
     <widget class="QWidget" name="loginScreen">
      <widget class="QStackedWidget" name="loginStackedWidget">
       <property name="geometry">
@@ -219,6 +222,19 @@
          <string>Vacation</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="logoutButton">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>121</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Logout</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="vacation">
        <widget class="QPushButton" name="vacationBackButton">
@@ -314,6 +330,19 @@
         </property>
         <property name="text">
          <string>Manage Teams</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="adminLogoutButton">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>30</y>
+          <width>121</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Logout</string>
         </property>
        </widget>
       </widget>

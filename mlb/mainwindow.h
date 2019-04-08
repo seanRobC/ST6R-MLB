@@ -27,6 +27,7 @@ private slots:
     //Home (0)
     void on_vacationButton_clicked();
     void on_displayTeamsButton_clicked();
+    void on_logoutButton_clicked();
 
     //Vacation (1)
     void on_vacationBackButton_clicked();
@@ -37,6 +38,7 @@ private slots:
     //Admin Home (3)
     void on_adminVacationButton_clicked();
     void on_manageTeamsButton_clicked();
+    void on_adminLogoutButton_clicked();
 
     //Manage (4)
     void on_manageTeamsBackButton_clicked();

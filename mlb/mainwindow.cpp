@@ -56,6 +56,8 @@ void MainWindow::on_loginButton_clicked(){
         }
         ui->primaryStackedWidget->setCurrentIndex(1);
         ui->loginInputStackedWidget->setCurrentIndex(0);
+        ui->usernameEntry->clear();
+        ui->passwordEntry->clear();
     }
     else {
         ui->loginInputStackedWidget->setCurrentIndex(1);
@@ -71,6 +73,12 @@ void MainWindow::on_vacationButton_clicked(){
 
 void MainWindow::on_displayTeamsButton_clicked(){
     ui->bbFanStackedWidget->setCurrentIndex(2);
+}
+
+void MainWindow::on_logoutButton_clicked(){
+    ui->loginStackedWidget->setCurrentIndex(0);
+    accessLevel = 0;
+    ui->primaryStackedWidget->setCurrentIndex(0);
 }
 
 //Vacation (1) - bbFan Stacked Widget
@@ -95,6 +103,12 @@ void MainWindow::on_adminVacationButton_clicked(){
 
 void MainWindow::on_manageTeamsButton_clicked(){
     ui->bbFanStackedWidget->setCurrentIndex(4);
+}
+
+void MainWindow::on_adminLogoutButton_clicked(){
+    ui->loginStackedWidget->setCurrentIndex(0);
+    accessLevel = 0;
+    ui->primaryStackedWidget->setCurrentIndex(0);
 }
 
 //Manage (4) - bbFan Stacked Widget
