@@ -29,7 +29,8 @@ SOURCES += \
         mainwindow.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    mlbteam.h
 
 FORMS += \
         mainwindow.ui

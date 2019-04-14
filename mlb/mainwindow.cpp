@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QTextStream>
+#include <QtDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -7,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     accessLevel = 0;
+
+    readMLBFile("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data.txt");
 
     //Set Stacked Widgets
     ui->primaryStackedWidget->setCurrentIndex(0);
@@ -17,12 +21,98 @@ MainWindow::MainWindow(QWidget *parent) :
     //Set text box entry restrictions
     ui->usernameEntry->setMaxLength(16);
     ui->passwordEntry->setMaxLength(16);
+
+    //Populate List Widgets
+    int j = 0;
+
+    for(int i = 0; i < MLBTeamVector.size(); i++)
+    {
+        ui->teamNameList->addItem(MLBTeamVector[i].getTeamName());
+        ui->stadiumNameList->addItem(MLBTeamVector[i].getStadiumName());
+        ui->capacityList->addItem(QString::number(MLBTeamVector[i].getCapacity()));
+        ui->locationList->addItem(MLBTeamVector[i].getLocation());
+        ui->surfaceList->addItem(MLBTeamVector[i].getSurface());
+        ui->leagueList->addItem(MLBTeamVector[i].getLeague());
+        ui->dateList->addItem(QString::number(MLBTeamVector[i].getDateOpened()));
+        ui->centerFieldList->addItem(QString::number(MLBTeamVector[i].getCenterField()));
+        ui->typologyList->addItem(MLBTeamVector[i].getTypelogy());
+        ui->roofTypeList->addItem(MLBTeamVector[i].getRoofType());
+//        ui->manageRestaurantListWidget->addItem(new QListWidgetItem(QIcon(icons[i]), restaurantsVector[i].getName()));   //icons[i]), restaurantsVector[i].getName()));
+//        ui->manageRestaurantListWidget->item(j)->setSizeHint(QSize(-1, 26));
+        ++j;
+    }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     accessLevel = 0;
+}
+
+void MainWindow::readMLBFile(QString filePath){
+
+    MLBTeamVector.clear();
+
+    QFile file(filePath);
+
+    QString nTeamName;
+    QString nStadiumName;
+    QString nLocation;
+    QString nSurface;
+    QString nLeague;
+    QString nTypelogy;
+    QString nRoofType;
+    int nId;
+    int nCapacity;
+    int nDateOpened;
+    int nCenterField;
+//    QVector<item> nMenu;
+//    float tempPrice = 0;
+//    int tempId = 0;
+//    int menuSize = 0;
+
+    QTextStream in(&file);
+    QString line;
+//    int newDistanceSize;
+//    QVector<float> tempDistance;
+    int numDeleted;
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::information(nullptr, "error", file.errorString());
+    }
+    else{
+        //read in nullified restaurants
+        line = in.readLine();
+        numDeleted = line.toInt();
+        for(int i = 0; i < numDeleted; i++){
+            line = in.readLine();
+            deletedIndexes.push_back(line.toInt());
+        }
+        in.readLine(); //Number of teams
+        in.readLine(); //Blank line
+
+        while(!in.atEnd()){
+            nTeamName = in.readLine();
+            nId = (in.readLine()).toInt();
+            nStadiumName = in.readLine();
+            nLocation = in.readLine();
+            nSurface = in.readLine();
+            nLeague = in.readLine();
+            nTypelogy = in.readLine();
+            nRoofType = in.readLine();
+            nCapacity = (in.readLine()).toInt();
+            nDateOpened = (in.readLine()).toInt();
+            nCenterField = (in.readLine()).toInt();
+
+            line = in.readLine();
+            if(line.isEmpty()){
+                MLBTeam tempTeam(nTeamName,nStadiumName,nLocation,nSurface,nLeague,nTypelogy
+                                 ,nRoofType,nId,nCapacity,nDateOpened,nCenterField);
+                MLBTeamVector.push_back(tempTeam);
+            }
+        }
+    }
+    file.close();
 }
 
 //Primary stacked widget index 0
