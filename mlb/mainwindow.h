@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include <QListWidget>
 #include <QMessageBox>
+#include "mlbteam.h"
+#include <QTextStream>
+#include <QFile>
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +21,9 @@ public:
     ~MainWindow();
 
 private slots:
+    //parcers
+    void readMLBFile(QString filePath);
+
     //Primary stacked widget index 0
     //Login
     void on_enterButton_clicked();
@@ -46,6 +52,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
     int accessLevel; //0 is default, 1 is bbFan, 2 is administrator
+    QVector<MLBTeam> MLBTeamVector;
+    QVector<int> nullifiedIndexes;
+    QVector<int> deletedIndexes;
 };
 
 #endif // MAINWINDOW_H
