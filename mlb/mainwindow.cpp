@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QTextStream>
 #include <QtDebug>
+#include <math.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,8 +26,25 @@ MainWindow::MainWindow(QWidget *parent) :
     //Populate List Widgets
     int j = 0;
 
+    QStringList title;
+    title <<"Team Name"<<"Stadium Name"<<"Capacity"<<"Location"<<"Surface"<<"League"<<"Date Opened"<<"Center Field Dist."<<"Typology"<<"Roof Type";
+    ui->manageTable->setColumnCount(10);
+    ui->manageTable->setHorizontalHeaderLabels(title);
+
     for(int i = 0; i < MLBTeamVector.size(); i++)
     {
+        ui->manageTable->insertRow(ui->manageTable->rowCount());
+        ui->manageTable->setItem(i,0,new QTableWidgetItem(MLBTeamVector[i].getTeamName()));
+        ui->manageTable->setItem(i,1,new QTableWidgetItem(MLBTeamVector[i].getStadiumName()));
+        ui->manageTable->setItem(i,2,new QTableWidgetItem((QString::number(MLBTeamVector[i].getCapacity()))));
+        ui->manageTable->setItem(i,3,new QTableWidgetItem(MLBTeamVector[i].getLocation()));
+        ui->manageTable->setItem(i,4,new QTableWidgetItem(MLBTeamVector[i].getSurface()));
+        ui->manageTable->setItem(i,5,new QTableWidgetItem(MLBTeamVector[i].getLeague()));
+        ui->manageTable->setItem(i,6,new QTableWidgetItem((QString::number(MLBTeamVector[i].getDateOpened()))));
+        ui->manageTable->setItem(i,7,new QTableWidgetItem((QString::number(MLBTeamVector[i].getCenterField()))+" ("+QString::number(round(MLBTeamVector[i].getCenterField()*.3048))+"m)"));
+        ui->manageTable->setItem(i,8,new QTableWidgetItem(MLBTeamVector[i].getTypelogy()));
+        ui->manageTable->setItem(i,9,new QTableWidgetItem(MLBTeamVector[i].getRoofType()));
+
         ui->teamNameList->addItem(MLBTeamVector[i].getTeamName());
         ui->stadiumNameList->addItem(MLBTeamVector[i].getStadiumName());
         ui->capacityList->addItem(QString::number(MLBTeamVector[i].getCapacity()));
@@ -37,6 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->centerFieldList->addItem(QString::number(MLBTeamVector[i].getCenterField()));
         ui->typologyList->addItem(MLBTeamVector[i].getTypelogy());
         ui->roofTypeList->addItem(MLBTeamVector[i].getRoofType());
+
 //        ui->manageRestaurantListWidget->addItem(new QListWidgetItem(QIcon(icons[i]), restaurantsVector[i].getName()));   //icons[i]), restaurantsVector[i].getName()));
 //        ui->manageRestaurantListWidget->item(j)->setSizeHint(QSize(-1, 26));
         ++j;
