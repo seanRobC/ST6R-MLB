@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QTextStream>
 #include <QtDebug>
+#include "QString"
+#include "QChar"
 #include <math.h>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     accessLevel = 0;
+    listTwo = -1;
 
     readMLBFile("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data.txt");
 
@@ -18,10 +21,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->loginStackedWidget->setCurrentIndex(0);
     ui->bbFanStackedWidget->setCurrentIndex(0);
     ui->loginInputStackedWidget->setCurrentIndex(0);
+    ui->addItemWidget->setCurrentIndex(0);
 
     //Set text box entry restrictions
     ui->usernameEntry->setMaxLength(16);
     ui->passwordEntry->setMaxLength(16);
+    ui->itemNameEntry->setMaxLength(40);
+    ui->itemPriceEntry->setMaxLength(8);
 
     //Populate List Widgets
     int j = 0;
@@ -89,7 +95,6 @@ void MainWindow::readMLBFile(QString filePath){
 //    float tempPrice = 0;
 //    int tempId = 0;
 //    int menuSize = 0;
-
     QTextStream in(&file);
     QString line;
 //    int newDistanceSize;
@@ -127,6 +132,11 @@ void MainWindow::readMLBFile(QString filePath){
             if(line.isEmpty()){
                 MLBTeam tempTeam(nTeamName,nStadiumName,nLocation,nSurface,nLeague,nTypelogy
                                  ,nRoofType,nId,nCapacity,nDateOpened,nCenterField);
+                tempTeam.addMenuItem("Baseball cap", 22.99);
+                tempTeam.addMenuItem("Baseball bat", 89.39);
+                tempTeam.addMenuItem("Team pennant", 17.99);
+                tempTeam.addMenuItem("Autographed baseball", 25.99);
+                tempTeam.addMenuItem("Team jersey", 199.99);
                 MLBTeamVector.push_back(tempTeam);
             }
         }
@@ -223,4 +233,109 @@ void MainWindow::on_adminLogoutButton_clicked(){
 //Manage (4) - bbFan Stacked Widget
 void MainWindow::on_manageTeamsBackButton_clicked(){
     ui->bbFanStackedWidget->setCurrentIndex(3);
+}
+
+//void MainWindow::on_manageTable_cellClicked(int row){
+//    ui->souvenirList_2->clear();
+//    ui->priceList_2->clear();
+
+//    int i = 0;
+//    while(ui->manageTable->itemAt(row,0)->text() != MLBTeamVector[i].getTeamName() && i < MLBTeamVector.size()){
+//        i++;
+//    }
+//    for (int j = 0;j<MLBTeamVector[i].getMenuSize();j++) {
+//        ui->souvenirList_2->addItem(MLBTeamVector[i].getSouvenirName(j));
+//        ui->priceList_2->addItem(QString::number(MLBTeamVector[i].getSouvenirPrice(j)));
+//        listTwo = i;
+//    }
+//}
+
+void MainWindow::on_addItemButton_clicked(){
+    if(ui->addItemWidget->currentIndex() == 0)
+        ui->addItemWidget->setCurrentIndex(1);
+    else {
+        ui->addItemWidget->setCurrentIndex(0);
+    }
+}
+
+void MainWindow::on_addItemConfirmationBox_accepted(){
+    if(ui->itemNameEntry->text() != "" && ui->itemPriceEntry->text() != "")
+    {
+        //check for valid float
+        if(isFloatNumber(ui->itemPriceEntry->text()))
+        {
+            //perform search for the item
+            MLBTeamVector[listTwo].addMenuItem(ui->itemNameEntry->text(), (double(int((ui->itemPriceEntry->text().toDouble()) * 100)))/100 );
+            ui->souvenirList_2->addItem(MLBTeamVector[listTwo].getSouvenirName(MLBTeamVector[listTwo].getMenuSize()-1));
+            ui->priceList_2->addItem(QString::number(MLBTeamVector[listTwo].getSouvenirPrice(MLBTeamVector[listTwo].getMenuSize()-1)));
+        }
+        else
+        {
+            QMessageBox::warning(nullptr, "Error", "Invalid Price Input! Please Enter a Float");
+        }
+    }
+
+    //clear line edits once finished with them
+    ui->itemNameEntry->clear();
+    ui->itemPriceEntry->clear();
+
+    //hide the add item overlay
+    ui->addItemWidget->setCurrentIndex(0);
+}
+
+void MainWindow::on_manageTable_currentItemChanged(){
+    ui->souvenirList_2->clear();
+    ui->priceList_2->clear();
+
+    //perform search for the item
+    int k = 0;
+    bool found = false;
+
+    while(!found && k < MLBTeamVector.size())
+    {
+        if(ui->manageTable->currentItem()->text() == MLBTeamVector[k].getTeamName())
+        {
+            found = true;
+        }
+        else
+        {
+            ++k;
+        }
+    }
+    for (int j = 0;j<MLBTeamVector[k].getMenuSize();j++) {
+        ui->souvenirList_2->addItem(MLBTeamVector[k].getSouvenirName(j));
+        ui->priceList_2->addItem(QString::number(MLBTeamVector[k].getSouvenirPrice(j)));
+    }
+    listTwo = k;
+}
+
+void MainWindow::on_addItemConfirmationBox_rejected(){
+    ui->itemNameEntry->clear();
+    ui->itemPriceEntry->clear();
+
+    ui->addItemWidget->setCurrentIndex(0);
+}
+
+//Helpers
+bool MainWindow::isFloatNumber(const QString& Qstring)
+{
+    string stdString = Qstring.toStdString();
+
+    string::const_iterator it = stdString.begin();
+    bool decimalPoint = false;
+    unsigned int minSize = 0;
+    if(stdString.size()>0 && (stdString[0] == '-' || stdString[0] == '+')){
+      it++;
+      minSize++;
+    }
+    while(it != stdString.end()){
+      if(*it == '.'){
+        if(!decimalPoint) decimalPoint = true;
+        else break;
+      }else if(!std::isdigit(*it) && ((*it!='f') || it+1 != stdString.end() || !decimalPoint)){
+        break;
+      }
+      ++it;
+    }
+    return stdString.size() > minSize && it == stdString.end();
 }

@@ -714,7 +714,7 @@
        <widget class="QLabel" name="label_28">
         <property name="geometry">
          <rect>
-          <x>1000</x>
+          <x>920</x>
           <y>460</y>
           <width>71</width>
           <height>16</height>
@@ -737,7 +737,7 @@
          <string>Price</string>
         </property>
        </widget>
-       <widget class="QStackedWidget" name="stackedWidget_2">
+       <widget class="QStackedWidget" name="addItemWidget">
         <property name="geometry">
          <rect>
           <x>740</x>
@@ -747,23 +747,10 @@
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="hide_2"/>
         <widget class="QWidget" name="addTime_2">
-         <widget class="QPushButton" name="addButton">
-          <property name="geometry">
-           <rect>
-            <x>50</x>
-            <y>60</y>
-            <width>111</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
          <widget class="QLabel" name="label_34">
           <property name="geometry">
            <rect>
@@ -808,6 +795,19 @@
             <width>111</width>
             <height>20</height>
            </rect>
+          </property>
+         </widget>
+         <widget class="QDialogButtonBox" name="addItemConfirmationBox">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>60</y>
+            <width>156</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="standardButtons">
+           <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
           </property>
          </widget>
         </widget>

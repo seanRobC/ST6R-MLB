@@ -7,6 +7,7 @@
 #include "mlbteam.h"
 #include <QTextStream>
 #include <QFile>
+#include <QTableWidget>
 
 namespace Ui {
 class MainWindow;
@@ -48,6 +49,14 @@ private slots:
 
     //Manage (4)
     void on_manageTeamsBackButton_clicked();
+//    void on_manageTable_cellClicked(int row);
+    void on_addItemButton_clicked();
+    void on_addItemConfirmationBox_accepted();
+    void on_manageTable_currentItemChanged();
+    void on_addItemConfirmationBox_rejected();
+
+    //Helpers
+    bool isFloatNumber(const QString& Qstring);
 
 private:
     Ui::MainWindow *ui;
@@ -55,6 +64,7 @@ private:
     QVector<MLBTeam> MLBTeamVector;
     QVector<int> nullifiedIndexes;
     QVector<int> deletedIndexes;
+    int listTwo;
 };
 
 #endif // MAINWINDOW_H

@@ -7,15 +7,13 @@ using namespace std;
 struct item{
     //constructor for easily initializing new items
     item(){}
-    item(QString newItemName, float newItemPrice, int newItemId)
+    item(QString newItemName, double newItemPrice)
     {
         itemName = newItemName;
         price = newItemPrice;
-        itemId = newItemId;
     }
     QString itemName;
-    float price;
-    int itemId;
+    double price;
 };
 
 class MLBTeam{
@@ -75,25 +73,16 @@ public:
     void changeCapacity(int d){capacity = d;}
     void changeDateOpened(int d){dateOpened = d;}
     void changeCenterField(int d){centerField = d;}
-    void addMenuItem(QString iName,float iPrice,int iId){
+    void addMenuItem(QString iName,double iPrice){
         //create new item
-        item newItem(iName, iPrice, iId);
+        item newItem(iName, iPrice);
 
         //push new item onto the menu
         menu.push_back(newItem);
     }
 
     void removeMenuItem(int key){
-        bool found = false;
-        int count = 0;
-
-        while(!found && count < menu.size()){
-            if(key == menu[count].itemId){
-                found = true;
-                menu.remove(count);
-            }
-            count++;
-        }
+        menu.removeAt(key);
     }
 
     //Accessor
@@ -108,6 +97,9 @@ public:
     int     getCapacity(){return capacity;}
     int     getDateOpened(){return dateOpened;}
     int     getCenterField(){return centerField;}
+    QString getSouvenirName(int key){return menu[key].itemName;}
+    double  getSouvenirPrice(int key){return menu[key].price;}
+    int     getMenuSize(){return menu.size();}
 
 private:
     QString teamName;
