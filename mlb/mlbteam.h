@@ -73,6 +73,8 @@ public:
     void changeCapacity(int d){capacity = d;}
     void changeDateOpened(int d){dateOpened = d;}
     void changeCenterField(int d){centerField = d;}
+    void changeSouvenirName(int key,QString d){menu[key].itemName = d;}
+    void changeSouvenirPrice(int key,double d){menu[key].price = d;}
     void addMenuItem(QString iName,double iPrice){
         //create new item
         item newItem(iName, iPrice);
@@ -84,6 +86,7 @@ public:
     void removeMenuItem(int key){
         menu.removeAt(key);
     }
+
 
     //Accessor
     QString getTeamName(){return teamName;}

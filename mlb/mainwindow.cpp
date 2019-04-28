@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i < MLBTeamVector.size(); i++)
     {
+        qDebug() << i;
         ui->manageTable->insertRow(ui->manageTable->rowCount());
         ui->manageTable->setItem(i,0,new QTableWidgetItem(MLBTeamVector[i].getTeamName()));
         ui->manageTable->setItem(i,1,new QTableWidgetItem(MLBTeamVector[i].getStadiumName()));
@@ -235,27 +236,105 @@ void MainWindow::on_manageTeamsBackButton_clicked(){
     ui->bbFanStackedWidget->setCurrentIndex(3);
 }
 
-//void MainWindow::on_manageTable_cellClicked(int row){
-//    ui->souvenirList_2->clear();
-//    ui->priceList_2->clear();
-
-//    int i = 0;
-//    while(ui->manageTable->itemAt(row,0)->text() != MLBTeamVector[i].getTeamName() && i < MLBTeamVector.size()){
-//        i++;
-//    }
-//    for (int j = 0;j<MLBTeamVector[i].getMenuSize();j++) {
-//        ui->souvenirList_2->addItem(MLBTeamVector[i].getSouvenirName(j));
-//        ui->priceList_2->addItem(QString::number(MLBTeamVector[i].getSouvenirPrice(j)));
-//        listTwo = i;
-//    }
-//}
-
 void MainWindow::on_addItemButton_clicked(){
     if(ui->addItemWidget->currentIndex() == 0)
         ui->addItemWidget->setCurrentIndex(1);
     else {
         ui->addItemWidget->setCurrentIndex(0);
     }
+}
+
+void MainWindow::on_deleteItemButton_clicked(){
+    //deletes the item selected on the manageMenuListWidget (not the price widget)
+    if(ui->souvenirList_2->currentItem() != nullptr)
+    {
+        //perform search for the item to be removed
+        int k = 0;
+        bool found = false;
+
+        while(!found && k < MLBTeamVector.size())
+        {
+            if(ui->manageTable->item(ui->manageTable->currentRow(),0)->text() == MLBTeamVector[k].getTeamName())
+            {
+                //QTextStream(stdout) << ui->manageRestaurantListWidget->currentItem()->text() << endl;
+                found = true;
+            }
+            else
+            {
+                ++k;
+            }
+        }
+        //remove items from lists
+        int index = ui->souvenirList_2->currentRow();
+        ui->souvenirList_2->takeItem(index);
+        ui->priceList_2->takeItem(index);
+
+        //remove items from data structure
+        MLBTeamVector[k].removeMenuItem(index);
+    }
+}
+
+void MainWindow::on_souvenirList_2_itemDoubleClicked(QListWidgetItem *item)
+{
+    //allow editing of the item name if double clicked
+    ui->souvenirList_2->openPersistentEditor(item);
+}
+
+void MainWindow::on_priceList_2_itemDoubleClicked(QListWidgetItem *item)
+{
+    //allow editing of the item price if double clicked
+    ui->priceList_2->openPersistentEditor(item);
+}
+
+void MainWindow::on_souvenirList_2_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    if(ui->souvenirList_2->isPersistentEditorOpen(previous))
+    {
+        int k = 0;
+        bool found = false;
+
+        while(!found && k < MLBTeamVector.size())
+        {
+            if(ui->manageTable->item(ui->manageTable->currentRow(),0)->text() == MLBTeamVector[k].getTeamName())
+                found = true;
+            else
+                k++;
+        }
+        MLBTeamVector[k].changeSouvenirName(previous->listWidget()->row(previous),previous->text());
+    }
+    ui->souvenirList_2->closePersistentEditor(previous);
+    ui->priceList_2->setCurrentRow(current->listWidget()->currentRow());
+}
+
+void MainWindow::on_priceList_2_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    if(ui->priceList_2->isPersistentEditorOpen(previous))
+    {
+        int k = 0;
+        bool found = false;
+
+        while(!found && k < MLBTeamVector.size())
+        {
+            if(ui->manageTable->item(ui->manageTable->currentRow(),0)->text() == MLBTeamVector[k].getTeamName())
+                found = true;
+            else
+                k++;
+        }
+        if(isFloatNumber(previous->text()))
+        {
+            MLBTeamVector[k].changeSouvenirPrice(previous->listWidget()->row(previous),previous->text().toDouble());
+        }
+        else
+        {
+            //input is not a float
+            QMessageBox::warning(nullptr, "Error", "Invalid Price Input! Please Enter a Float");
+
+            previous->setText(QString::number(MLBTeamVector[k].getSouvenirPrice(previous->listWidget()->row(previous))));
+
+        }
+        ui->priceList_2->closePersistentEditor(previous);
+    }
+    ui->souvenirList->setCurrentRow(current->listWidget()->currentRow());
 }
 
 void MainWindow::on_addItemConfirmationBox_accepted(){
@@ -283,24 +362,62 @@ void MainWindow::on_addItemConfirmationBox_accepted(){
     ui->addItemWidget->setCurrentIndex(0);
 }
 
-void MainWindow::on_manageTable_currentItemChanged(){
+void MainWindow::on_manageTable_itemDoubleClicked(QTableWidgetItem *item)
+{
+    //if a restaurant name is double clicked, it allows user to edit the name directly
+    ui->manageTable->openPersistentEditor(item);
+}
+
+void MainWindow::on_manageTable_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous){
+    //solve bug where program is crashign when changing row on restaurant list widget
+    //close persistent editor and update vector with whatever is edited
+    if(ui->souvenirList_2->isPersistentEditorOpen(ui->souvenirList_2->currentItem()))
+    {
+        ui->souvenirList_2->closePersistentEditor(ui->souvenirList_2->currentItem());
+        MLBTeamVector[previous->tableWidget()->row(previous)].changeSouvenirName(ui->manageTable->currentRow(),ui->manageTable->currentItem()->text());
+    }
+    //solve bug where program is crashign when changing row on restaurant list widget
+    //close persistent editor and update vector with whatever is edited
+    if(ui->priceList_2->isPersistentEditorOpen(ui->priceList_2->currentItem()))
+    {
+        ui->priceList_2->closePersistentEditor(ui->priceList_2->currentItem());
+        MLBTeamVector[previous->tableWidget()->row(previous)].changeSouvenirPrice(ui->priceList_2->currentRow(),ui->priceList_2->currentItem()->text().toDouble());
+    }
+
+
+    if(ui->manageTable->isPersistentEditorOpen(previous))
+    {
+        //close any editors and update the vector with the new name of restaurant
+        ui->manageTable->closePersistentEditor(previous);
+        MLBTeamVector[previous->tableWidget()->row(previous)].changeteamName(previous->text());
+    }
+
+    //update the menu list when a new restaurant is selected
+    ui->souvenirList_2->blockSignals(true);
+    ui->priceList_2->blockSignals(true);
     ui->souvenirList_2->clear();
     ui->priceList_2->clear();
+    ui->souvenirList_2->blockSignals(false);
+    ui->priceList_2->blockSignals(false);
+
+    qDebug() << MLBTeamVector[1].getTeamName();
+
+    ui->manageTable->setCurrentCell(current->row(),current->column());
+    ui->souvenirList_2->clear();
+    ui->priceList_2->clear();
+    const QPoint loc(ui->manageTable->currentRow(),0);
+
+    qDebug() << MLBTeamVector[0].getSouvenirName(1);
 
     //perform search for the item
     int k = 0;
     bool found = false;
 
-    while(!found && k < MLBTeamVector.size())
-    {
-        if(ui->manageTable->currentItem()->text() == MLBTeamVector[k].getTeamName())
-        {
+    while(!found && k < MLBTeamVector.size()){
+        if(ui->manageTable->item(ui->manageTable->currentRow(),0)->text() == MLBTeamVector[k].getTeamName())
             found = true;
-        }
         else
-        {
-            ++k;
-        }
+            k++;
     }
     for (int j = 0;j<MLBTeamVector[k].getMenuSize();j++) {
         ui->souvenirList_2->addItem(MLBTeamVector[k].getSouvenirName(j));
@@ -337,5 +454,5 @@ bool MainWindow::isFloatNumber(const QString& Qstring)
       }
       ++it;
     }
-    return stdString.size() > minSize && it == stdString.end();
+    return stdString.size() > minSize && it == stdString.end() && Qstring.toFloat() >=0;
 }

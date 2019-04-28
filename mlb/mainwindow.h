@@ -51,9 +51,15 @@ private slots:
     void on_manageTeamsBackButton_clicked();
 //    void on_manageTable_cellClicked(int row);
     void on_addItemButton_clicked();
+    void on_deleteItemButton_clicked();
+    void on_souvenirList_2_itemDoubleClicked(QListWidgetItem *item);
+    void on_priceList_2_itemDoubleClicked(QListWidgetItem *item);
     void on_addItemConfirmationBox_accepted();
-    void on_manageTable_currentItemChanged();
+    void on_manageTable_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
     void on_addItemConfirmationBox_rejected();
+    void on_priceList_2_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void on_souvenirList_2_currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void on_manageTable_itemDoubleClicked(QTableWidgetItem *item);
 
     //Helpers
     bool isFloatNumber(const QString& Qstring);
