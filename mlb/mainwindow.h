@@ -24,6 +24,7 @@ public:
 private slots:
     //parcers
     void readMLBFile(QString filePath);
+    void readMLBFile2(QString filePath);
 
     //Primary stacked widget index 0
     //Login
@@ -48,8 +49,8 @@ private slots:
     void on_adminLogoutButton_clicked();
 
     //Manage (4)
+    void on_addTeamsButton_clicked();
     void on_manageTeamsBackButton_clicked();
-//    void on_manageTable_cellClicked(int row);
     void on_addItemButton_clicked();
     void on_deleteItemButton_clicked();
     void on_souvenirList_2_itemDoubleClicked(QListWidgetItem *item);
@@ -63,6 +64,7 @@ private slots:
 
     //Helpers
     bool isFloatNumber(const QString& Qstring);
+    bool isIntNumber(const QString& Qstring);
 
 private:
     Ui::MainWindow *ui;
@@ -71,6 +73,7 @@ private:
     QVector<int> nullifiedIndexes;
     QVector<int> deletedIndexes;
     int listTwo;
+    int filesAdded;
 };
 
 #endif // MAINWINDOW_H

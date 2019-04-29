@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     accessLevel = 0;
     listTwo = -1;
+    filesAdded = -1;
 
     readMLBFile("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data.txt");
 
@@ -145,6 +146,55 @@ void MainWindow::readMLBFile(QString filePath){
     file.close();
 }
 
+void MainWindow::readMLBFile2(QString filePath){
+    QFile file(filePath);
+
+    QString nTeamName;
+    QString nStadiumName;
+    QString nLocation;
+    QString nSurface;
+    QString nLeague;
+    QString nTypelogy;
+    QString nRoofType;
+    int nId;
+    int nCapacity;
+    int nDateOpened;
+    int nCenterField;
+    QTextStream in(&file);
+    QString line;
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        QMessageBox::information(nullptr, "error", file.errorString());
+    }
+    else{
+        while(!in.atEnd()){
+            nTeamName = in.readLine();
+            nId = (in.readLine()).toInt();
+            nStadiumName = in.readLine();
+            nLocation = in.readLine();
+            nSurface = in.readLine();
+            nLeague = in.readLine();
+            nTypelogy = in.readLine();
+            nRoofType = in.readLine();
+            nCapacity = (in.readLine()).toInt();
+            nDateOpened = (in.readLine()).toInt();
+            nCenterField = (in.readLine()).toInt();
+
+            line = in.readLine();
+            if(line.isEmpty()){
+                MLBTeam tempTeam(nTeamName,nStadiumName,nLocation,nSurface,nLeague,nTypelogy
+                                 ,nRoofType,nId,nCapacity,nDateOpened,nCenterField);
+                tempTeam.addMenuItem("Baseball cap", 22.99);
+                tempTeam.addMenuItem("Baseball bat", 89.39);
+                tempTeam.addMenuItem("Team pennant", 17.99);
+                tempTeam.addMenuItem("Autographed baseball", 25.99);
+                tempTeam.addMenuItem("Team jersey", 199.99);
+                MLBTeamVector.push_back(tempTeam);
+            }
+        }
+    }
+    file.close();
+}
 //Primary stacked widget index 0
 //Login
 void MainWindow::on_enterButton_clicked(){
@@ -232,6 +282,13 @@ void MainWindow::on_adminLogoutButton_clicked(){
 }
 
 //Manage (4) - bbFan Stacked Widget
+void MainWindow::on_addTeamsButton_clicked(){
+    if(filesAdded == -1){
+        readMLBFile2("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data2.txt");
+        filesAdded++;
+    }
+}
+
 void MainWindow::on_manageTeamsBackButton_clicked(){
     ui->bbFanStackedWidget->setCurrentIndex(3);
 }
@@ -328,7 +385,6 @@ void MainWindow::on_priceList_2_currentItemChanged(QListWidgetItem *current, QLi
         {
             //input is not a float
             QMessageBox::warning(nullptr, "Error", "Invalid Price Input! Please Enter a Float");
-
             previous->setText(QString::number(MLBTeamVector[k].getSouvenirPrice(previous->listWidget()->row(previous))));
 
         }
@@ -341,17 +397,14 @@ void MainWindow::on_addItemConfirmationBox_accepted(){
     if(ui->itemNameEntry->text() != "" && ui->itemPriceEntry->text() != "")
     {
         //check for valid float
-        if(isFloatNumber(ui->itemPriceEntry->text()))
-        {
+        if(isFloatNumber(ui->itemPriceEntry->text())){
             //perform search for the item
             MLBTeamVector[listTwo].addMenuItem(ui->itemNameEntry->text(), (double(int((ui->itemPriceEntry->text().toDouble()) * 100)))/100 );
             ui->souvenirList_2->addItem(MLBTeamVector[listTwo].getSouvenirName(MLBTeamVector[listTwo].getMenuSize()-1));
             ui->priceList_2->addItem(QString::number(MLBTeamVector[listTwo].getSouvenirPrice(MLBTeamVector[listTwo].getMenuSize()-1)));
         }
         else
-        {
             QMessageBox::warning(nullptr, "Error", "Invalid Price Input! Please Enter a Float");
-        }
     }
 
     //clear line edits once finished with them
@@ -369,30 +422,83 @@ void MainWindow::on_manageTable_itemDoubleClicked(QTableWidgetItem *item)
 }
 
 void MainWindow::on_manageTable_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous){
-    //solve bug where program is crashign when changing row on restaurant list widget
-    //close persistent editor and update vector with whatever is edited
-    if(ui->souvenirList_2->isPersistentEditorOpen(ui->souvenirList_2->currentItem()))
-    {
+    if(ui->souvenirList_2->isPersistentEditorOpen(ui->souvenirList_2->currentItem())){
         ui->souvenirList_2->closePersistentEditor(ui->souvenirList_2->currentItem());
         MLBTeamVector[previous->tableWidget()->row(previous)].changeSouvenirName(ui->manageTable->currentRow(),ui->manageTable->currentItem()->text());
     }
-    //solve bug where program is crashign when changing row on restaurant list widget
-    //close persistent editor and update vector with whatever is edited
-    if(ui->priceList_2->isPersistentEditorOpen(ui->priceList_2->currentItem()))
-    {
+    if(ui->priceList_2->isPersistentEditorOpen(ui->priceList_2->currentItem())){
         ui->priceList_2->closePersistentEditor(ui->priceList_2->currentItem());
         MLBTeamVector[previous->tableWidget()->row(previous)].changeSouvenirPrice(ui->priceList_2->currentRow(),ui->priceList_2->currentItem()->text().toDouble());
     }
 
-
-    if(ui->manageTable->isPersistentEditorOpen(previous))
-    {
-        //close any editors and update the vector with the new name of restaurant
+    if(ui->manageTable->isPersistentEditorOpen(previous)){
         ui->manageTable->closePersistentEditor(previous);
-        MLBTeamVector[previous->tableWidget()->row(previous)].changeteamName(previous->text());
+        switch(previous->column()){
+        case 0: MLBTeamVector[previous->tableWidget()->row(previous)].changeteamName(previous->text());
+            break;
+        case 1: MLBTeamVector[previous->tableWidget()->row(previous)].changeStadiumName(previous->text());
+            break;
+        case 2: if(isIntNumber(previous->text()))
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeCapacity(previous->text().toInt());
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid number Input! Please Enter a valid int");
+                ui->manageTable->setItem(previous->row(),2,new QTableWidgetItem((QString::number(MLBTeamVector[previous->row()].getCapacity()))));
+            break;
+        case 3: MLBTeamVector[previous->tableWidget()->row(previous)].changeLocation(previous->text());
+            break;
+        case 4: if(previous->text()[0].toUpper() == "G")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeSurface("Grass");
+                else if(previous->text()[0].toUpper() == "A")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeSurface("AstroTurf GameDay Grass");
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid Input, Grass or AstroTurf");
+                ui->manageTable->setItem(previous->row(),4,new QTableWidgetItem(MLBTeamVector[previous->row()].getSurface()));
+            break;
+        case 5: if(previous->text()[0].toUpper() == "A")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeLeague("American");
+                else if(previous->text()[0].toUpper() == "N")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeLeague("National");
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid Input, American or National");
+                ui->manageTable->setItem(previous->row(),5,new QTableWidgetItem(MLBTeamVector[previous->row()].getLeague()));
+            break;
+        case 6: if(isIntNumber(previous->text()))
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeDateOpened(previous->text().toInt());
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid number Input! Please Enter a valid int");
+                ui->manageTable->setItem(previous->row(),6,new QTableWidgetItem((QString::number(MLBTeamVector[previous->row()].getDateOpened()))));
+            break;
+        case 7: if(isIntNumber(previous->text()))
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeCenterField(previous->text().toInt());
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid number Input! Please Enter a valid int");
+                ui->manageTable->setItem(previous->row(),7,new QTableWidgetItem((QString::number(MLBTeamVector[previous->row()].getCenterField()))+" ("+QString::number(round(MLBTeamVector[previous->row()].getCenterField()*.3048))+"m)"));
+            break;
+        case 8: if(previous->text()[0].toUpper() == "C")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeTypelogy("Contemporary");
+                else if(previous->text().toUpper() == "RETRO MODERN")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeTypelogy("Retro Modern");
+                else if(previous->text().toUpper() == "RETRO CLASSIC")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeTypelogy("Retro Classic");
+                else if(previous->text()[0].toUpper() == "M")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeTypelogy("Multipurpose");
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid Input, Contemporary, Retro Modern, Retro Classic, or Multipurpose");
+                ui->manageTable->setItem(previous->row(),8,new QTableWidgetItem(MLBTeamVector[previous->row()].getTypelogy()));
+            break;
+        case 9: if(previous->text()[0].toUpper() == "O")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeRoofType("Open");
+                else if(previous->text()[0].toUpper() == "F")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeRoofType("Fixed");
+                else if(previous->text()[0].toUpper() == "R")
+                    MLBTeamVector[previous->tableWidget()->row(previous)].changeRoofType("Retractable");
+                else
+                    QMessageBox::warning(nullptr, "Error", "Invalid Input, Open, Fixed, or Retractable");
+                ui->manageTable->setItem(previous->row(),9,new QTableWidgetItem(MLBTeamVector[previous->row()].getRoofType()));
+            break;
+        }
     }
 
-    //update the menu list when a new restaurant is selected
     ui->souvenirList_2->blockSignals(true);
     ui->priceList_2->blockSignals(true);
     ui->souvenirList_2->clear();
@@ -401,18 +507,24 @@ void MainWindow::on_manageTable_currentItemChanged(QTableWidgetItem *current, QT
     ui->priceList_2->blockSignals(false);
 
     qDebug() << MLBTeamVector[1].getTeamName();
+    qDebug() << MLBTeamVector[1].getStadiumName();
+    qDebug() << MLBTeamVector[1].getCapacity();
+    qDebug() << MLBTeamVector[1].getLocation();
+    qDebug() << MLBTeamVector[1].getSurface();
+    qDebug() << MLBTeamVector[1].getLeague();
+    qDebug() << MLBTeamVector[1].getDateOpened();
+    qDebug() << MLBTeamVector[1].getCenterField();
+    qDebug() << MLBTeamVector[1].getTypelogy();
+    qDebug() << MLBTeamVector[1].getRoofType();
 
     ui->manageTable->setCurrentCell(current->row(),current->column());
     ui->souvenirList_2->clear();
     ui->priceList_2->clear();
     const QPoint loc(ui->manageTable->currentRow(),0);
 
-    qDebug() << MLBTeamVector[0].getSouvenirName(1);
-
     //perform search for the item
     int k = 0;
     bool found = false;
-
     while(!found && k < MLBTeamVector.size()){
         if(ui->manageTable->item(ui->manageTable->currentRow(),0)->text() == MLBTeamVector[k].getTeamName())
             found = true;
@@ -455,4 +567,22 @@ bool MainWindow::isFloatNumber(const QString& Qstring)
       ++it;
     }
     return stdString.size() > minSize && it == stdString.end() && Qstring.toFloat() >=0;
+}
+
+bool MainWindow::isIntNumber(const QString& Qstring){
+    string stdString = Qstring.toStdString();
+
+    string::const_iterator it = stdString.begin();
+    unsigned int minSize = 0;
+    if(stdString.size()>0 && (stdString[0] == '-' || stdString[0] == '+')){
+      it++;
+      minSize++;
+    }
+    while(it != stdString.end()){
+        if(!std::isdigit(*it) && ((*it!='f') || it+1 != stdString.end())){
+            break;
+      }
+      ++it;
+    }
+    return stdString.size() > minSize && it == stdString.end() && Qstring.toInt() >=0;
 }
