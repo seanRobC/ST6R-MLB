@@ -86,7 +86,7 @@ int main (int argc, char *argv[])
 
     // Test Requirement 5
     cout << "Sort by Stadium Name - Test Requirement 5" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_teamname());
+    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_stadiumname());
     for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
@@ -147,8 +147,8 @@ int main (int argc, char *argv[])
                     " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
                     " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
         }
-        cout << "Number of parks with open roof type is: " << count_open << endl;
     }
+    cout << "Number of parks with open roof type is: " << count_open << endl;
     cout << endl << endl;
 
     // Test Requirement 10

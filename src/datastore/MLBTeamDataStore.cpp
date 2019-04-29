@@ -187,7 +187,6 @@ void TeamDataStore::save(const string path)
             outfile << (*it).m_sLocation << ",";
             outfile << (*it).m_sPlayingSurface << ",";
             outfile << (*it).m_sLeague << ",";
-            outfile << (*it).m_sLeague << ",";
             outfile << (*it).m_nYearOpened << ",";
             outfile << (*it).m_nDistCenterFieldFeet << ",";
             outfile << (*it).m_nDistCenterFieldMeters << ",";
