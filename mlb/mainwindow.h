@@ -50,6 +50,7 @@ private slots:
 
     //Manage (4)
     void on_addTeamsButton_clicked();
+    void on_deleteTeamButton_clicked();
     void on_manageTeamsBackButton_clicked();
     void on_addItemButton_clicked();
     void on_deleteItemButton_clicked();
@@ -63,6 +64,7 @@ private slots:
     void on_manageTable_itemDoubleClicked(QTableWidgetItem *item);
 
     //Helpers
+    void updateTable();
     bool isFloatNumber(const QString& Qstring);
     bool isIntNumber(const QString& Qstring);
 
@@ -72,7 +74,6 @@ private:
     QVector<MLBTeam> MLBTeamVector;
     QVector<int> nullifiedIndexes;
     QVector<int> deletedIndexes;
-    int listTwo;
     int filesAdded;
 };
 
