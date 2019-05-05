@@ -49,6 +49,8 @@ private slots:
     void on_adminLogoutButton_clicked();
 
     //Manage (4)
+    void on_leagueBox_2_activated(int index);
+    void on_sortTypeBox_2_activated(int index);
     void on_addTeamsButton_clicked();
     void on_deleteTeamButton_clicked();
     void on_manageTeamsBackButton_clicked();
@@ -64,7 +66,7 @@ private slots:
     void on_manageTable_itemDoubleClicked(QTableWidgetItem *item);
 
     //Helpers
-    void updateTable();
+    void updateTable(QVector<int> vec);
     bool isFloatNumber(const QString& Qstring);
     bool isIntNumber(const QString& Qstring);
 
@@ -75,6 +77,8 @@ private:
     QVector<int> nullifiedIndexes;
     QVector<int> deletedIndexes;
     int filesAdded;
+    int leagueSetting;
+    bool roofExclude;
 };
 
 #endif // MAINWINDOW_H

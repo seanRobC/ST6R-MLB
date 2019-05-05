@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     accessLevel = 0;
     filesAdded = -1;
+    leagueSetting = 0;
 
     readMLBFile("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data.txt");
 
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->bbFanStackedWidget->setCurrentIndex(0);
     ui->loginInputStackedWidget->setCurrentIndex(0);
     ui->addItemWidget->setCurrentIndex(0);
+    ui->centerFieldStacked_2->setCurrentIndex(0);
 
     //Set text box entry restrictions
     ui->usernameEntry->setMaxLength(16);
@@ -39,7 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     for(int i = 0; i < MLBTeamVector.size(); i++)
     {
-        qDebug() << i;
         ui->manageTable->insertRow(ui->manageTable->rowCount());
         ui->manageTable->setItem(i,0,new QTableWidgetItem(MLBTeamVector[i].getTeamName()));
         ui->manageTable->setItem(i,1,new QTableWidgetItem(MLBTeamVector[i].getStadiumName()));
@@ -67,6 +68,12 @@ MainWindow::MainWindow(QWidget *parent) :
 //        ui->manageRestaurantListWidget->item(j)->setSizeHint(QSize(-1, 26));
         ++j;
     }
+    QStringList title2;
+    title2 <<"Default"<<"Team Name"<<"Stadium Name"<<"Capacity"<<"Date Opened"<<"Max Center Field Dist."<<"Min Center Field Dist."<<"Typology";
+    QStringList title3;
+    title3 <<"All"<<"National"<<"American";
+    ui->sortTypeBox_2->addItems(title2);
+    ui->leagueBox_2->addItems(title3);
 }
 
 MainWindow::~MainWindow()
@@ -294,6 +301,842 @@ void MainWindow::on_adminLogoutButton_clicked(){
 }
 
 //Manage (4) - bbFan Stacked Widget
+void MainWindow::on_leagueBox_2_activated(int index){
+    switch(index){
+    case 0: leagueSetting = 0;
+            ui->sortTypeBox_2->setCurrentIndex(0);
+            on_sortTypeBox_2_activated(ui->sortTypeBox_2->currentIndex());
+        break;
+    case 1: leagueSetting = 1;
+            ui->sortTypeBox_2->setCurrentIndex(0);
+            on_sortTypeBox_2_activated(ui->sortTypeBox_2->currentIndex());
+        break;
+    case 2: leagueSetting = 2;
+            ui->sortTypeBox_2->setCurrentIndex(0);
+            on_sortTypeBox_2_activated(ui->sortTypeBox_2->currentIndex());
+        break;
+    }
+}
+
+void MainWindow::on_sortTypeBox_2_activated(int index){
+    QVector<int> vec;
+    QVector<QString> temp;
+
+    int impNum = 0;
+    int errorFlag = 0;
+
+    if(leagueSetting == 0){
+        impNum = MLBTeamVector[0].getCenterField();
+    }
+    else if (leagueSetting == 1) {
+        int o =0;
+        while (MLBTeamVector[o].getLeague()!="National"&&o<MLBTeamVector.size()) {
+            o++;
+        }
+        if(o < MLBTeamVector.size()){
+            impNum = MLBTeamVector[o].getCenterField();
+        }
+        else {
+            errorFlag = 1;
+        }
+    }
+    else if (leagueSetting == 2) {
+        int o =0;
+        while (MLBTeamVector[o].getLeague()!="American"&&o<MLBTeamVector.size()) {
+            o++;
+        }
+        if(o < MLBTeamVector.size()){
+            impNum = MLBTeamVector[o].getCenterField();
+        }
+        errorFlag = 1;
+    }
+
+    ui->centerFieldStacked_2->setCurrentIndex(0);
+
+    switch (index) {
+    case 0: for(int i = 0;i<MLBTeamVector.size();i++){
+                if(leagueSetting == 0)
+                    vec.push_back(i);
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague() == "National"){
+                        vec.push_back(i);
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague() == "American"){
+                        vec.push_back(i);
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    case 1: if(leagueSetting == 0){
+                vec.push_back(0);
+                for (int i = 1;i<MLBTeamVector.size();i++) {
+                    int c = MLBTeamVector[i].getTeamName()[0].toUpper().unicode();
+                    bool spotF = false;
+                    int k = 0;
+                    while (!spotF && k < vec.size()) {
+                        if(c < MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                        else if (c == MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()) {
+                            int j = 1;
+                            while (!spotF && j < MLBTeamVector[i].getTeamName().size()&& j < MLBTeamVector[vec[k]].getTeamName().size()) {
+                                if(MLBTeamVector[i].getTeamName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (MLBTeamVector[i].getTeamName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode())
+                                    j++;
+                                else {
+                                    if(k+1 == vec.size()){
+                                        vec.insert(k+1,i);
+                                        spotF = true;
+                                    }
+                                    else if (MLBTeamVector[k+1].getTeamName()[0].toUpper().unicode() != MLBTeamVector[i].getTeamName()[0].toUpper().unicode()) {
+                                        vec.insert(k+1,i);
+                                        spotF = true;
+                                    }
+                                    else {
+                                        k++;
+                                    }
+                                }
+                            }
+                            if(!spotF){
+                                if(MLBTeamVector[i].getTeamName().size() < MLBTeamVector[vec[k]].getTeamName().size()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if(MLBTeamVector[i].getTeamName().size() > MLBTeamVector[vec[k]].getTeamName().size()){
+                                    vec.insert(k+1,i);
+                                    spotF = true;
+                                }
+                            }
+                        }
+                        else {
+                            k++;
+                        }
+                    }
+                    if(!spotF){
+                        vec.insert(k,i);
+                        spotF = true;
+                    }
+                }
+            }
+            else if (leagueSetting == 1) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "National" && o <MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                    for (int i = o+1;i<MLBTeamVector.size();i++) {
+                        if(MLBTeamVector[i].getLeague() == "National"){
+                            int c = MLBTeamVector[i].getTeamName()[0].toUpper().unicode();
+                            bool spotF = false;
+                            int k = 0;
+                            while (!spotF && k < vec.size()) {
+                                if(c < MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (c == MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()) {
+                                    int j = 1;
+                                    while (!spotF && j < MLBTeamVector[i].getTeamName().size()&& j < MLBTeamVector[vec[k]].getTeamName().size()) {
+                                        if(MLBTeamVector[i].getTeamName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if (MLBTeamVector[i].getTeamName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode())
+                                            j++;
+                                        else {
+                                            if(k+1 == vec.size()){
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else if (MLBTeamVector[k+1].getTeamName()[0].toUpper().unicode() != MLBTeamVector[i].getTeamName()[0].toUpper().unicode()) {
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else {
+                                                k++;
+                                            }
+                                        }
+                                    }
+                                    if(!spotF){
+                                        if(MLBTeamVector[i].getTeamName().size() < MLBTeamVector[vec[k]].getTeamName().size()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if(MLBTeamVector[i].getTeamName().size() > MLBTeamVector[vec[k]].getTeamName().size()){
+                                            vec.insert(k+1,i);
+                                            spotF = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    k++;
+                                }
+                            }
+                            if(!spotF){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting == 2) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "American" && o <MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                    for (int i = o+1;i<MLBTeamVector.size();i++) {
+                        if(MLBTeamVector[i].getLeague() == "American"){
+                            int c = MLBTeamVector[i].getTeamName()[0].toUpper().unicode();
+                            bool spotF = false;
+                            int k = 0;
+                            while (!spotF && k < vec.size()) {
+                                if(c < MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (c == MLBTeamVector[vec[k]].getTeamName()[0].toUpper().unicode()) {
+                                    int j = 1;
+                                    while (!spotF && j < MLBTeamVector[i].getTeamName().size()&& j < MLBTeamVector[vec[k]].getTeamName().size()) {
+                                        if(MLBTeamVector[i].getTeamName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if (MLBTeamVector[i].getTeamName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getTeamName()[j].toUpper().unicode())
+                                            j++;
+                                        else {
+                                            if(k+1 == vec.size()){
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else if (MLBTeamVector[k+1].getTeamName()[0].toUpper().unicode() != MLBTeamVector[i].getTeamName()[0].toUpper().unicode()) {
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else {
+                                                k++;
+                                            }
+                                        }
+                                    }
+                                    if(!spotF){
+                                        if(MLBTeamVector[i].getTeamName().size() < MLBTeamVector[vec[k]].getTeamName().size()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if(MLBTeamVector[i].getTeamName().size() > MLBTeamVector[vec[k]].getTeamName().size()){
+                                            vec.insert(k+1,i);
+                                            spotF = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    k++;
+                                }
+                            }
+                            if(!spotF){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                        }
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    case 2: if(leagueSetting == 0){
+                vec.push_back(0);
+                for (int i = 1;i<MLBTeamVector.size();i++) {
+                    int c = MLBTeamVector[i].getStadiumName()[0].toUpper().unicode();
+                    bool spotF = false;
+                    int k = 0;
+                    while (!spotF && k < vec.size()) {
+                        if(c < MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                        else if (c == MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()) {
+                            int j = 1;
+                            while (!spotF && j < MLBTeamVector[i].getStadiumName().size()&& j < MLBTeamVector[vec[k]].getStadiumName().size()) {
+                                if(MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode())
+                                    j++;
+                                else {
+                                    if(k+1 == vec.size()){
+                                        vec.insert(k+1,i);
+                                        spotF = true;
+                                    }
+                                    else if (MLBTeamVector[k+1].getStadiumName()[0].toUpper().unicode() != MLBTeamVector[i].getStadiumName()[0].toUpper().unicode()) {
+                                        vec.insert(k+1,i);
+                                        spotF = true;
+                                    }
+                                    else {
+                                        k++;
+                                    }
+                                }
+                            }
+                            if(!spotF){
+                                if(MLBTeamVector[i].getStadiumName().size() < MLBTeamVector[vec[k]].getStadiumName().size()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if(MLBTeamVector[i].getStadiumName().size() > MLBTeamVector[vec[k]].getStadiumName().size()){
+                                    vec.insert(k+1,i);
+                                    spotF = true;
+                                }
+                            }
+                        }
+                        else {
+                            k++;
+                        }
+                    }
+                    if(!spotF){
+                        vec.insert(k,i);
+                        spotF = true;
+                    }
+                }
+            }
+            else if (leagueSetting == 1) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "National" && o <MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                    for (int i = o+1;i<MLBTeamVector.size();i++) {
+                        if(MLBTeamVector[i].getLeague() == "National"){
+                            int c = MLBTeamVector[i].getStadiumName()[0].toUpper().unicode();
+                            bool spotF = false;
+                            int k = 0;
+                            while (!spotF && k < vec.size()) {
+                                if(c < MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (c == MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()) {
+                                    int j = 1;
+                                    while (!spotF && j < MLBTeamVector[i].getStadiumName().size()&& j < MLBTeamVector[vec[k]].getStadiumName().size()) {
+                                        if(MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if (MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode())
+                                            j++;
+                                        else {
+                                            if(k+1 == vec.size()){
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else if (MLBTeamVector[k+1].getStadiumName()[0].toUpper().unicode() != MLBTeamVector[i].getStadiumName()[0].toUpper().unicode()) {
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else {
+                                                k++;
+                                            }
+                                        }
+                                    }
+                                    if(!spotF){
+                                        if(MLBTeamVector[i].getStadiumName().size() < MLBTeamVector[vec[k]].getStadiumName().size()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if(MLBTeamVector[i].getStadiumName().size() > MLBTeamVector[vec[k]].getStadiumName().size()){
+                                            vec.insert(k+1,i);
+                                            spotF = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    k++;
+                                }
+                            }
+                            if(!spotF){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting == 2) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "American" && o <MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                    for (int i = o+1;i<MLBTeamVector.size();i++) {
+                        if(MLBTeamVector[i].getLeague() == "American"){
+                            int c = MLBTeamVector[i].getStadiumName()[0].toUpper().unicode();
+                            bool spotF = false;
+                            int k = 0;
+                            while (!spotF && k < vec.size()) {
+                                if(c < MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()){
+                                    vec.insert(k,i);
+                                    spotF = true;
+                                }
+                                else if (c == MLBTeamVector[vec[k]].getStadiumName()[0].toUpper().unicode()) {
+                                    int j = 1;
+                                    while (!spotF && j < MLBTeamVector[i].getStadiumName().size()&& j < MLBTeamVector[vec[k]].getStadiumName().size()) {
+                                        if(MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() < MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if (MLBTeamVector[i].getStadiumName()[j].toUpper().unicode() == MLBTeamVector[vec[k]].getStadiumName()[j].toUpper().unicode())
+                                            j++;
+                                        else {
+                                            if(k+1 == vec.size()){
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else if (MLBTeamVector[k+1].getStadiumName()[0].toUpper().unicode() != MLBTeamVector[i].getStadiumName()[0].toUpper().unicode()) {
+                                                vec.insert(k+1,i);
+                                                spotF = true;
+                                            }
+                                            else {
+                                                k++;
+                                            }
+                                        }
+                                    }
+                                    if(!spotF){
+                                        if(MLBTeamVector[i].getStadiumName().size() < MLBTeamVector[vec[k]].getStadiumName().size()){
+                                            vec.insert(k,i);
+                                            spotF = true;
+                                        }
+                                        else if(MLBTeamVector[i].getStadiumName().size() > MLBTeamVector[vec[k]].getStadiumName().size()){
+                                            vec.insert(k+1,i);
+                                            spotF = true;
+                                        }
+                                    }
+                                }
+                                else {
+                                    k++;
+                                }
+                            }
+                            if(!spotF){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                        }
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    case 3: if(leagueSetting == 0){
+                vec.push_back(0);
+                for (int i = 1;i<MLBTeamVector.size();i++) {
+                    bool spotF = false;
+                    int k = 0;
+                    while (!spotF && k < vec.size()) {
+                        if(MLBTeamVector[i].getCapacity() <= MLBTeamVector[vec[k]].getCapacity()){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                        else {
+                            k++;
+                        }
+                    }
+                    if(!spotF){
+                        vec.insert(k,i);
+                        spotF = true;
+                    }
+                }
+            }
+            else if (leagueSetting ==1) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "National" && o < MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                }
+                for (int i = o+1;i<MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "National"){
+                        bool spotF = false;
+                        int k = 0;
+                        while (!spotF && k < vec.size()) {
+                            if(MLBTeamVector[i].getCapacity() <= MLBTeamVector[vec[k]].getCapacity()){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                            else {
+                                k++;
+                            }
+                        }
+                        if(!spotF){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting ==2) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "American" && o < MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                }
+                for (int i = o+1;i<MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "American"){
+                        bool spotF = false;
+                        int k = 0;
+                        while (!spotF && k < vec.size()) {
+                            if(MLBTeamVector[i].getCapacity() <= MLBTeamVector[vec[k]].getCapacity()){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                            else {
+                                k++;
+                            }
+                        }
+                        if(!spotF){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    case 4: if(leagueSetting == 0){
+                vec.push_back(0);
+                for (int i = 1;i<MLBTeamVector.size();i++) {
+                    bool spotF = false;
+                    int k = 0;
+                    while (!spotF && k < vec.size()) {
+                        if(MLBTeamVector[i].getDateOpened() <= MLBTeamVector[vec[k]].getDateOpened()){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                        else {
+                            k++;
+                        }
+                    }
+                    if(!spotF){
+                        vec.insert(k,i);
+                        spotF = true;
+                    }
+                }
+            }
+            else if (leagueSetting == 1) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "National" && o < MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                }
+                for (int i = o+1;i<MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "National"){
+                        bool spotF = false;
+                        int k = 0;
+                        while (!spotF && k < vec.size()) {
+                            if(MLBTeamVector[i].getDateOpened() <= MLBTeamVector[vec[k]].getDateOpened()){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                            else {
+                                k++;
+                            }
+                        }
+                        if(!spotF){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting == 2) {
+                int o = 0;
+                while (MLBTeamVector[o].getLeague() != "American" && o < MLBTeamVector.size()) {
+                    o++;
+                }
+                if(o < MLBTeamVector.size()){
+                    vec.push_back(o);
+                }
+                for (int i = o+1;i<MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "American"){
+                        bool spotF = false;
+                        int k = 0;
+                        while (!spotF && k < vec.size()) {
+                            if(MLBTeamVector[i].getDateOpened() <= MLBTeamVector[vec[k]].getDateOpened()){
+                                vec.insert(k,i);
+                                spotF = true;
+                            }
+                            else {
+                                k++;
+                            }
+                        }
+                        if(!spotF){
+                            vec.insert(k,i);
+                            spotF = true;
+                        }
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    case 5: if(leagueSetting == 0){
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(impNum < MLBTeamVector[i].getCenterField()){
+                        impNum = MLBTeamVector[i].getCenterField();
+                        vec.clear();
+                        vec.push_back(i);
+                    }
+                    else if (impNum == MLBTeamVector[i].getCenterField()) {
+                        vec.push_back(i);
+                    }
+                }
+            }
+            else if (leagueSetting ==1) {
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() =="National"){
+                        if(impNum < MLBTeamVector[i].getCenterField()){
+                            impNum = MLBTeamVector[i].getCenterField();
+                            vec.clear();
+                            vec.push_back(i);
+                        }
+                        else if (impNum == MLBTeamVector[i].getCenterField()) {
+                            vec.push_back(i);
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting ==2) {
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() =="American"){
+                        if(impNum < MLBTeamVector[i].getCenterField()){
+                            impNum = MLBTeamVector[i].getCenterField();
+                            vec.clear();
+                            vec.push_back(i);
+                        }
+                        else if (impNum == MLBTeamVector[i].getCenterField()) {
+                            vec.push_back(i);
+                        }
+                    }
+                }
+            }
+            ui->stadiumNameList_2->clear();
+            ui->centerFieldList_2->clear();
+            for (int i = 0;i < vec.size();i++) {
+                ui->stadiumNameList_2->addItem(MLBTeamVector[vec[i]].getTeamName());
+                ui->centerFieldList_2->addItem((QString::number(MLBTeamVector[vec[i]].getCenterField()))+" ("+QString::number(round(MLBTeamVector[vec[i]].getCenterField()*.3048))+"m)");
+            }
+            ui->centerFieldStacked_2->setCurrentIndex(1);
+        break;
+    case 6: if(leagueSetting == 0){
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(impNum > MLBTeamVector[i].getCenterField()){
+                        impNum = MLBTeamVector[i].getCenterField();
+                        vec.clear();
+                        vec.push_back(i);
+                    }
+                    else if (impNum == MLBTeamVector[i].getCenterField()) {
+                        vec.push_back(i);
+                    }
+                }
+            }
+            else if (leagueSetting == 1) {
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "National"){
+                        if(impNum > MLBTeamVector[i].getCenterField()){
+                            impNum = MLBTeamVector[i].getCenterField();
+                            vec.clear();
+                            vec.push_back(i);
+                        }
+                        else if (impNum == MLBTeamVector[i].getCenterField()) {
+                            vec.push_back(i);
+                        }
+                    }
+                }
+            }
+            else if (leagueSetting == 2) {
+                for (int i = 1;i < MLBTeamVector.size();i++) {
+                    if(MLBTeamVector[i].getLeague() == "American"){
+                        if(impNum > MLBTeamVector[i].getCenterField()){
+                            impNum = MLBTeamVector[i].getCenterField();
+                            vec.clear();
+                            vec.push_back(i);
+                        }
+                        else if (impNum == MLBTeamVector[i].getCenterField()) {
+                            vec.push_back(i);
+                        }
+                    }
+                }
+            }
+            ui->stadiumNameList_2->clear();
+            ui->centerFieldList_2->clear();
+            for (int i = 0;i < vec.size();i++) {
+                ui->stadiumNameList_2->addItem(MLBTeamVector[vec[i]].getTeamName());
+                ui->centerFieldList_2->addItem((QString::number(MLBTeamVector[vec[i]].getCenterField()))+" ("+QString::number(round(MLBTeamVector[vec[i]].getCenterField()*.3048))+"m)");
+            }
+            ui->centerFieldStacked_2->setCurrentIndex(1);
+        break;
+    case 7: for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Retro Modern"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Retro Modern"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Retro Modern"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Retro Classic"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Retro Classic"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Retro Classic"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Modern"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Modern"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Modern"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Contemporary"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Contemporary"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Contemporary"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Jewel Box"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Jewel Box"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Jewel Box"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            for (int i = 0;i<MLBTeamVector.size();i++) {
+                if(leagueSetting == 0){
+                    QString qs = MLBTeamVector[i].getTypelogy();
+                    if(qs == "Multipurpose"){
+                        vec.push_front(i);
+                    }
+                }
+                else if (leagueSetting == 1) {
+                    if(MLBTeamVector[i].getLeague()=="National"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Multipurpose"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+                else if (leagueSetting == 2) {
+                    if(MLBTeamVector[i].getLeague()=="American"){
+                        QString qs = MLBTeamVector[i].getTypelogy();
+                        if(qs == "Multipurpose"){
+                            vec.push_front(i);
+                        }
+                    }
+                }
+            }
+            updateTable(vec);
+        break;
+    }
+}
+
 void MainWindow::on_addTeamsButton_clicked(){
     if(filesAdded == -1){
         readMLBFile2("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data2.txt");
@@ -553,17 +1396,6 @@ void MainWindow::on_manageTable_currentItemChanged(QTableWidgetItem *current, QT
     ui->souvenirList_2->blockSignals(false);
     ui->priceList_2->blockSignals(false);
 
-    qDebug() << MLBTeamVector[1].getTeamName();
-    qDebug() << MLBTeamVector[1].getStadiumName();
-    qDebug() << MLBTeamVector[1].getCapacity();
-    qDebug() << MLBTeamVector[1].getLocation();
-    qDebug() << MLBTeamVector[1].getSurface();
-    qDebug() << MLBTeamVector[1].getLeague();
-    qDebug() << MLBTeamVector[1].getDateOpened();
-    qDebug() << MLBTeamVector[1].getCenterField();
-    qDebug() << MLBTeamVector[1].getTypelogy();
-    qDebug() << MLBTeamVector[1].getRoofType();
-
     ui->manageTable->setCurrentCell(current->row(),current->column());
     ui->souvenirList_2->clear();
     ui->priceList_2->clear();
@@ -593,46 +1425,20 @@ void MainWindow::on_addItemConfirmationBox_rejected(){
 }
 
 //Helpers
-void MainWindow::updateTable(){
-    ui->manageTable->clear();
-
-    //Populate List Widgets
-    int j = 0;
-
-    QStringList title;
-    title <<"Team Name"<<"Stadium Name"<<"Capacity"<<"Location"<<"Surface"<<"League"<<"Date Opened"<<"Center Field Dist."<<"Typology"<<"Roof Type";
-    ui->manageTable->setColumnCount(10);
-    ui->manageTable->setHorizontalHeaderLabels(title);
-
-    for(int i = 0; i < MLBTeamVector.size(); i++)
-    {
-        qDebug() << i;
-        ui->manageTable->insertRow(ui->manageTable->rowCount());
-        ui->manageTable->setItem(i,0,new QTableWidgetItem(MLBTeamVector[i].getTeamName()));
-        ui->manageTable->setItem(i,1,new QTableWidgetItem(MLBTeamVector[i].getStadiumName()));
-        ui->manageTable->setItem(i,2,new QTableWidgetItem((QString::number(MLBTeamVector[i].getCapacity()))));
-        ui->manageTable->setItem(i,3,new QTableWidgetItem(MLBTeamVector[i].getLocation()));
-        ui->manageTable->setItem(i,4,new QTableWidgetItem(MLBTeamVector[i].getSurface()));
-        ui->manageTable->setItem(i,5,new QTableWidgetItem(MLBTeamVector[i].getLeague()));
-        ui->manageTable->setItem(i,6,new QTableWidgetItem((QString::number(MLBTeamVector[i].getDateOpened()))));
-        ui->manageTable->setItem(i,7,new QTableWidgetItem((QString::number(MLBTeamVector[i].getCenterField()))+" ("+QString::number(round(MLBTeamVector[i].getCenterField()*.3048))+"m)"));
-        ui->manageTable->setItem(i,8,new QTableWidgetItem(MLBTeamVector[i].getTypelogy()));
-        ui->manageTable->setItem(i,9,new QTableWidgetItem(MLBTeamVector[i].getRoofType()));
-
-//        ui->teamNameList->addItem(MLBTeamVector[i].getTeamName());
-//        ui->stadiumNameList->addItem(MLBTeamVector[i].getStadiumName());
-//        ui->capacityList->addItem(QString::number(MLBTeamVector[i].getCapacity()));
-//        ui->locationList->addItem(MLBTeamVector[i].getLocation());
-//        ui->surfaceList->addItem(MLBTeamVector[i].getSurface());
-//        ui->leagueList->addItem(MLBTeamVector[i].getLeague());
-//        ui->dateList->addItem(QString::number(MLBTeamVector[i].getDateOpened()));
-//        ui->centerFieldList->addItem(QString::number(MLBTeamVector[i].getCenterField()));
-//        ui->typologyList->addItem(MLBTeamVector[i].getTypelogy());
-//        ui->roofTypeList->addItem(MLBTeamVector[i].getRoofType());
-
-//        ui->manageRestaurantListWidget->addItem(new QListWidgetItem(QIcon(icons[i]), restaurantsVector[i].getName()));   //icons[i]), restaurantsVector[i].getName()));
-//        ui->manageRestaurantListWidget->item(j)->setSizeHint(QSize(-1, 26));
-        ++j;
+void MainWindow::updateTable(QVector<int> vec){
+    ui->manageTable->setRowCount(vec.size());
+    for(int i = 0; i < vec.size(); i++){
+        int t = vec[i];
+        ui->manageTable->setItem(i,0,new QTableWidgetItem(MLBTeamVector[t].getTeamName()));
+        ui->manageTable->setItem(i,1,new QTableWidgetItem(MLBTeamVector[t].getStadiumName()));
+        ui->manageTable->setItem(i,2,new QTableWidgetItem((QString::number(MLBTeamVector[t].getCapacity()))));
+        ui->manageTable->setItem(i,3,new QTableWidgetItem(MLBTeamVector[t].getLocation()));
+        ui->manageTable->setItem(i,4,new QTableWidgetItem(MLBTeamVector[t].getSurface()));
+        ui->manageTable->setItem(i,5,new QTableWidgetItem(MLBTeamVector[t].getLeague()));
+        ui->manageTable->setItem(i,6,new QTableWidgetItem((QString::number(MLBTeamVector[t].getDateOpened()))));
+        ui->manageTable->setItem(i,7,new QTableWidgetItem((QString::number(MLBTeamVector[t].getCenterField()))+" ("+QString::number(round(MLBTeamVector[t].getCenterField()*.3048))+"m)"));
+        ui->manageTable->setItem(i,8,new QTableWidgetItem(MLBTeamVector[t].getTypelogy()));
+        ui->manageTable->setItem(i,9,new QTableWidgetItem(MLBTeamVector[t].getRoofType()));
     }
 }
 
