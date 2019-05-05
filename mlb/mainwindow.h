@@ -41,7 +41,12 @@ private slots:
     void on_vacationBackButton_clicked();
 
     //Display (2)
+    void on_openRoofOnly_stateChanged(int state);
+    void on_leagueBox_activated(int index);
+    void on_sortTypeBox_activated(int index);
     void on_displayTeamsBackButton_clicked();
+    void on_displayTable_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
+
 
     //Admin Home (3)
     void on_adminVacationButton_clicked();
@@ -49,6 +54,7 @@ private slots:
     void on_adminLogoutButton_clicked();
 
     //Manage (4)
+    void on_openRoofOnly_2_stateChanged(int state);
     void on_leagueBox_2_activated(int index);
     void on_sortTypeBox_2_activated(int index);
     void on_addTeamsButton_clicked();
@@ -66,6 +72,7 @@ private slots:
     void on_manageTable_itemDoubleClicked(QTableWidgetItem *item);
 
     //Helpers
+    void updateDisplay(QVector<int> vec);
     void updateTable(QVector<int> vec);
     bool isFloatNumber(const QString& Qstring);
     bool isIntNumber(const QString& Qstring);
