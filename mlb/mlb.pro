@@ -30,7 +30,9 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    mlbteam.h
+    mlbteam.h \
+    vacation.h \
+    reciept.h
 
 FORMS += \
         mainwindow.ui

@@ -8,6 +8,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QTableWidget>
+#include "vacation.h"
 
 namespace Ui {
 class MainWindow;
@@ -38,6 +39,10 @@ private slots:
     void on_logoutButton_clicked();
 
     //Vacation (1)
+    void on_checkAllButton_clicked();
+    void on_selectTeamsListWidget_itemChanged(QListWidgetItem*item);
+    void on_takeTripButton_clicked();
+    void on_optimizeTripButton_clicked();
     void on_vacationBackButton_clicked();
 
     //Display (2)
@@ -46,7 +51,6 @@ private slots:
     void on_sortTypeBox_activated(int index);
     void on_displayTeamsBackButton_clicked();
     void on_displayTable_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
-
 
     //Admin Home (3)
     void on_adminVacationButton_clicked();
@@ -86,6 +90,7 @@ private:
     int filesAdded;
     int leagueSetting;
     bool roofExclude;
+    vacation currentVacation;
 };
 
 #endif // MAINWINDOW_H

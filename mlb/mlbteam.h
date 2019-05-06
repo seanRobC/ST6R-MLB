@@ -7,13 +7,31 @@ using namespace std;
 struct item{
     //constructor for easily initializing new items
     item(){}
-    item(QString newItemName, double newItemPrice)
+    item(QString newItemName, double newItemPrice,int newItemQuantity)
     {
         itemName = newItemName;
         price = newItemPrice;
+        itemQuantity = newItemQuantity;
     }
     QString itemName;
     double price;
+    int itemQuantity;
+};
+
+class TeamEdge{
+public:
+    int m_nTeam;
+    int m_nDistance;
+    bool m_bVisited;
+    bool m_bDiscovery;
+    bool m_bBack;
+    void ClearVisited(void) { m_bVisited = false; }
+    void SetVisited(void) { m_bVisited = true; }
+    bool IsVisited(void) { return(m_bVisited); }
+    void ClearDiscovered(void) { m_bDiscovery = false; }
+    void SetDiscovered(void) { m_bDiscovery = true; }
+    void ClearBack(void) { m_bBack = false; }
+    void SetBack(void) { m_bBack = true; }
 };
 
 class MLBTeam{
@@ -75,9 +93,9 @@ public:
     void changeCenterField(int d){centerField = d;}
     void changeSouvenirName(int key,QString d){menu[key].itemName = d;}
     void changeSouvenirPrice(int key,double d){menu[key].price = d;}
-    void addMenuItem(QString iName,double iPrice){
+    void addMenuItem(QString iName,double iPrice,int iQuan){
         //create new item
-        item newItem(iName, iPrice);
+        item newItem(iName, iPrice,iQuan);
 
         //push new item onto the menu
         menu.push_back(newItem);
@@ -85,6 +103,15 @@ public:
 
     void removeMenuItem(int key){
         menu.removeAt(key);
+    }
+    void addEdge(int d, int q){
+        TeamEdge t;
+        t.m_nTeam = d;
+        t.m_nDistance = q;
+        m_Distances.push_back(t);
+    }
+    void removeEdge(int key){
+        m_Distances.remove(key);
     }
 
 
@@ -103,6 +130,10 @@ public:
     QString getSouvenirName(int key){return menu[key].itemName;}
     double  getSouvenirPrice(int key){return menu[key].price;}
     int     getMenuSize(){return menu.size();}
+    int     getItemQuantity(int key){return menu[key].itemQuantity;}
+    int     getEdgeSize(){return m_Distances.size();}
+    int     getEdgeId(int key){return m_Distances[key].m_nTeam;}
+    int     getEdgeDistance(int key){return m_Distances[key].m_nDistance;}
 
 private:
     QString teamName;
@@ -117,6 +148,7 @@ private:
     int dateOpened;
     int centerField;     //distance to center field
     QVector<item> menu;
+    QVector<TeamEdge> m_Distances;
 };
 
 #endif // MLBTEAM_H

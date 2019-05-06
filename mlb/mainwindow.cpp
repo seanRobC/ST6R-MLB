@@ -26,6 +26,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->centerFieldStacked->setCurrentIndex(0);
     ui->centerFieldStacked_2->setCurrentIndex(0);
 
+    //allows users to move items around in the vacation list
+    ui->editTeamsListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->editTeamsListWidget->setDragEnabled(true);
+    ui->editTeamsListWidget->setDragDropMode(QAbstractItemView::InternalMove);
+    ui->editTeamsListWidget->viewport()->setAcceptDrops(true);
+    ui->editTeamsListWidget->setDropIndicatorShown(true);
+
     //Set text box entry restrictions
     ui->usernameEntry->setMaxLength(16);
     ui->passwordEntry->setMaxLength(16);
@@ -100,21 +107,19 @@ void MainWindow::readMLBFile(QString filePath){
     int nCapacity;
     int nDateOpened;
     int nCenterField;
-//    QVector<item> nMenu;
-//    float tempPrice = 0;
-//    int tempId = 0;
-//    int menuSize = 0;
+    struct edge{
+        int id;
+        int dist;
+    };
+    QVector<edge> edgeVec;
     QTextStream in(&file);
     QString line;
-//    int newDistanceSize;
-//    QVector<float> tempDistance;
     int numDeleted;
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         QMessageBox::information(nullptr, "error", file.errorString());
     }
     else{
-        //read in nullified restaurants
         line = in.readLine();
         numDeleted = line.toInt();
         for(int i = 0; i < numDeleted; i++){
@@ -136,17 +141,28 @@ void MainWindow::readMLBFile(QString filePath){
             nCapacity = (in.readLine()).toInt();
             nDateOpened = (in.readLine()).toInt();
             nCenterField = (in.readLine()).toInt();
-
             line = in.readLine();
+            while(!(line.isEmpty())){
+                edge e;
+                e.id = line.toInt();
+                line = in.readLine();
+                e.dist = line.toInt();
+                edgeVec.push_back(e);
+                line = in.readLine();
+            }
             if(line.isEmpty()){
                 MLBTeam tempTeam(nTeamName,nStadiumName,nLocation,nSurface,nLeague,nTypelogy
                                  ,nRoofType,nId,nCapacity,nDateOpened,nCenterField);
-                tempTeam.addMenuItem("Baseball cap", 22.99);
-                tempTeam.addMenuItem("Baseball bat", 89.39);
-                tempTeam.addMenuItem("Team pennant", 17.99);
-                tempTeam.addMenuItem("Autographed baseball", 25.99);
-                tempTeam.addMenuItem("Team jersey", 199.99);
+                tempTeam.addMenuItem("Baseball cap", 22.99,1);
+                tempTeam.addMenuItem("Baseball bat", 89.39,1);
+                tempTeam.addMenuItem("Team pennant", 17.99,1);
+                tempTeam.addMenuItem("Autographed baseball", 25.99,1);
+                tempTeam.addMenuItem("Team jersey", 199.99,1);
+                for (int i = 0;i <edgeVec.size();i++) {
+                    tempTeam.addEdge(edgeVec[i].id,edgeVec[i].dist);
+                }
                 MLBTeamVector.push_back(tempTeam);
+                edgeVec.clear();
             }
         }
     }
@@ -169,6 +185,11 @@ void MainWindow::readMLBFile2(QString filePath){
     int nCenterField;
     QTextStream in(&file);
     QString line;
+    struct edge{
+        int id;
+        int dist;
+    };
+    QVector<edge> edgeVec;
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         QMessageBox::information(nullptr, "error", file.errorString());
@@ -186,17 +207,42 @@ void MainWindow::readMLBFile2(QString filePath){
             nCenterField = (in.readLine()).toInt();
             nTypelogy = in.readLine();
             nRoofType = in.readLine();
-
             line = in.readLine();
+            while(!(line.isEmpty())){
+                edge e;
+                e.id = line.toInt();
+                line = in.readLine();
+                e.dist = line.toInt();
+                edgeVec.push_back(e);
+                int k = 0;
+                bool found = false;
+                while(k < MLBTeamVector.size() && !found){
+                    if(MLBTeamVector[k].getId() == e.id){
+                        MLBTeamVector[k].addEdge(nId,e.dist);
+                        found = true;
+                    }
+                    else {
+                        k++;
+                    }
+                }
+                if(!found){
+                    edgeVec.pop_back();
+                }
+                line = in.readLine();
+            }
             if(line.isEmpty()){
                 MLBTeam tempTeam(nTeamName,nStadiumName,nLocation,nSurface,nLeague,nTypelogy
                                  ,nRoofType,nId,nCapacity,nDateOpened,nCenterField);
-                tempTeam.addMenuItem("Baseball cap", 22.99);
-                tempTeam.addMenuItem("Baseball bat", 89.39);
-                tempTeam.addMenuItem("Team pennant", 17.99);
-                tempTeam.addMenuItem("Autographed baseball", 25.99);
-                tempTeam.addMenuItem("Team jersey", 199.99);
+                tempTeam.addMenuItem("Baseball cap", 22.99,1);
+                tempTeam.addMenuItem("Baseball bat", 89.39,1);
+                tempTeam.addMenuItem("Team pennant", 17.99,1);
+                tempTeam.addMenuItem("Autographed baseball", 25.99,1);
+                tempTeam.addMenuItem("Team jersey", 199.99,1);
+                for (int i = 0;i <edgeVec.size();i++) {
+                    tempTeam.addEdge(edgeVec[i].id,edgeVec[i].dist);
+                }
                 MLBTeamVector.push_back(tempTeam);
+                edgeVec.clear();
             }
         }
     }
@@ -270,7 +316,18 @@ void MainWindow::on_loginButton_clicked(){
 //Primary Stacked widget index 1
 //Home (0) - bbFan Stacked Widget
 void MainWindow::on_vacationButton_clicked(){
+    int j = 0;
+    //update the list view in the manage restaurants page
+    for(int i = 0; i < MLBTeamVector.size(); i++)
+    {
+        ui->selectTeamsListWidget->addItem(MLBTeamVector[i].getTeamName());
+
+        ui->selectTeamsListWidget->item(j)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        ui->selectTeamsListWidget->item(j)->setCheckState(Qt::Unchecked);
+        ++j;
+    }
     ui->bbFanStackedWidget->setCurrentIndex(1);
+    ui->vacationStackedWidget->setCurrentIndex(0);
 }
 
 void MainWindow::on_displayTeamsButton_clicked(){
@@ -284,6 +341,59 @@ void MainWindow::on_logoutButton_clicked(){
 }
 
 //Vacation (1) - bbFan Stacked Widget
+void MainWindow::on_checkAllButton_clicked(){
+    for (int i = 0;i<MLBTeamVector.size();i++) {
+        ui->selectTeamsListWidget->item(i)->setCheckState(Qt::CheckState(2));
+    }
+}
+
+void MainWindow::on_selectTeamsListWidget_itemChanged(QListWidgetItem*item){
+    //if item is checked it adds it to the secondary list
+    if(item->checkState() == 2)
+    {
+        ui->editTeamsListWidget->addItem(item->text());
+
+        //ui->customEditRestaurantListWidget->item(ui->customEditRestaurantListWidget->count() - 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled);
+
+        QTextStream(stdout) <<  ui->editTeamsListWidget->item(ui->editTeamsListWidget->count() - 1)->text()  << ui->editTeamsListWidget->dragDropMode() << endl;
+
+    }
+    else if (item->checkState() == 0) //if item is unchecked
+    {
+        //perform search for the item to be removed
+        int i = 0;
+        bool found = false;
+
+        while(!found && i < ui->editTeamsListWidget->count())
+        {
+            if(item->text() == ui->editTeamsListWidget->item(i)->text())
+            {
+                found = true;
+            }
+            else
+            {
+                ++i;
+            }
+        }
+        ui->editTeamsListWidget->takeItem(i);
+    }
+}
+
+void MainWindow::on_takeTripButton_clicked(){
+    qDebug() << "HAMMMMMMMMMMMMM";
+    for (int i = 0;i < MLBTeamVector.size();i++) {
+        qDebug() << "---------------------------------";
+        for (int j = 0;j<MLBTeamVector[i].getEdgeSize();j++) {
+            qDebug() << MLBTeamVector[i].getEdgeId(j);
+            qDebug() << MLBTeamVector[i].getEdgeDistance(j);
+        }
+    }
+}
+
+void MainWindow::on_optimizeTripButton_clicked(){
+
+}
+
 void MainWindow::on_vacationBackButton_clicked(){
     switch (accessLevel) {
     case 1: ui->bbFanStackedWidget->setCurrentIndex(0);
@@ -2187,7 +2297,19 @@ void MainWindow::on_displayTable_currentItemChanged(QTableWidgetItem *current, Q
 
 //Admin Home (3) - bbFan Stacked Widget
 void MainWindow::on_adminVacationButton_clicked(){
+    int j = 0;
+    //update the list view in the manage restaurants page
+    ui->selectTeamsListWidget->clear();
+    for(int i = 0; i < MLBTeamVector.size(); i++)
+    {
+        ui->selectTeamsListWidget->addItem(MLBTeamVector[i].getTeamName());
+
+        ui->selectTeamsListWidget->item(j)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        ui->selectTeamsListWidget->item(j)->setCheckState(Qt::Unchecked);
+        ++j;
+    }
     ui->bbFanStackedWidget->setCurrentIndex(1);
+    ui->vacationStackedWidget->setCurrentIndex(0);
 }
 
 void MainWindow::on_manageTeamsButton_clicked(){
@@ -4075,8 +4197,20 @@ void MainWindow::on_deleteTeamButton_clicked(){
                 ++k;
         }
         int i = ui->manageTable->currentRow();
-        if(found)
+        if(found){
+            int j = 0;
+            while (j<MLBTeamVector.size()) {
+                for (int d = 0;d<MLBTeamVector[j].getEdgeSize();d++) {
+                    if(MLBTeamVector[j].getEdgeId(d) == MLBTeamVector[k].getId()){
+                        MLBTeamVector[j].removeEdge(d);
+                    }
+                }
+                j++;
+            }
+
+
             MLBTeamVector.remove(k);
+        }
         ui->manageTable->removeRow(i);
         ui->priceList_2->clear();
         ui->souvenirList_2->clear();
@@ -4211,7 +4345,7 @@ void MainWindow::on_addItemConfirmationBox_accepted(){
             }
             //perform search for the item
             if(found){
-                MLBTeamVector[k].addMenuItem(ui->itemNameEntry->text(), (double(int((ui->itemPriceEntry->text().toDouble()) * 100)))/100 );
+                MLBTeamVector[k].addMenuItem(ui->itemNameEntry->text(), (double(int((ui->itemPriceEntry->text().toDouble()) * 100)))/100 ,1);
                 ui->souvenirList_2->addItem(MLBTeamVector[k].getSouvenirName(MLBTeamVector[k].getMenuSize()-1));
                 ui->priceList_2->addItem(QString::number(MLBTeamVector[k].getSouvenirPrice(MLBTeamVector[k].getMenuSize()-1)));
             }
