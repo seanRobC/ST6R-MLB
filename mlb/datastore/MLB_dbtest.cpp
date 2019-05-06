@@ -78,9 +78,12 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamname());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        if (!it->IsDeleted())
+        {
+            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        }
     }
     cout << endl << endl;
 
@@ -89,9 +92,12 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_stadiumname());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        if (!it->IsDeleted())
+        {
+            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        }
     }
     cout << endl << endl;
 
@@ -100,11 +106,14 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_stadiumname());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        if ((*it).getLeague() == "American")
+        if (!it->IsDeleted())
         {
-            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            if ((*it).getLeague() == "American")
+            {
+                cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                        " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                        " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            }
         }
     }
     cout << endl << endl;
@@ -114,11 +123,14 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamname());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        if ((*it).getLeague() == "National")
+        if (!it->IsDeleted())
         {
-            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            if ((*it).getLeague() == "National")
+            {
+                cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                        " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                        " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            }
         }
     }
     cout << endl << endl;
@@ -128,9 +140,12 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_typology());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        if (!it->IsDeleted())
+        {
+            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        }
     }
     cout << endl << endl;
 
@@ -140,12 +155,15 @@ int main (int argc, char *argv[])
     int count_open = 0;
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        if ((*it).getRoofType() == "Open")
+        if (!it->IsDeleted())
         {
-            count_open++;
-            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            if ((*it).getRoofType() == "Open")
+            {
+                count_open++;
+                cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                        " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                        " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            }
         }
     }
     cout << "Number of parks with open roof type is: " << count_open << endl;
@@ -156,9 +174,12 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_yearopen());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        if (!it->IsDeleted())
+        {
+            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+        }
     }
     cout << endl << endl;
 
@@ -168,10 +189,13 @@ int main (int argc, char *argv[])
     int total_capacity = 0;
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
-       total_capacity += (*it).getCapacity();
+        if (!it->IsDeleted())
+        {
+            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+           total_capacity += (*it).getCapacity();
+        }
     }
     cout << "total seating capacity of all MLB parks: " << total_capacity;
     cout << endl << endl;
@@ -181,29 +205,39 @@ int main (int argc, char *argv[])
     sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_distcenterfield());
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
-    }
-    cout << "-------------------------------------------" << endl;
-    int greatest_distance = 0;
-    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
-    {
-        if ((*it).getCenterField() > greatest_distance)
-        {
-            greatest_distance = (*it).getCenterField();
-        }
-    }
-    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
-    {
-        if ((*it).getCenterField() == greatest_distance)
+        if (!it->IsDeleted())
         {
             cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                     " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
                     " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
         }
     }
+    cout << "-------------------------------------------" << endl;
+    int greatest_distance = 0;
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
+    {
+        if (!it->IsDeleted())
+        {
+            if ((*it).getCenterField() > greatest_distance)
+            {
+                greatest_distance = (*it).getCenterField();
+            }
+        }
+    }
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
+    {
+        if (!it->IsDeleted())
+        {
+            if ((*it).getCenterField() == greatest_distance)
+            {
+                cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                        " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                        " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            }
+        }
+    }
     cout << endl << endl;
+
 
     // Test Requirement 13
     cout << "Display Park(s) with smallest distance to center field - Test Requirement 13" << endl;
@@ -211,19 +245,25 @@ int main (int argc, char *argv[])
     int smallest_distance = 9999;
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        if ((*it).getCenterField() < smallest_distance)
+        if (!it->IsDeleted())
         {
+            if ((*it).getCenterField() < smallest_distance)
+            {
 
-            smallest_distance = (*it).getCenterField();
+                smallest_distance = (*it).getCenterField();
+            }
         }
     }
     for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
-        if ((*it).getCenterField() == smallest_distance)
+        if (!it->IsDeleted())
         {
-            cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
-                    " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
-                    " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            if ((*it).getCenterField() == smallest_distance)
+            {
+                cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
+                        " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
+                        " - Year Open: " << (*it).getDateOpened() << " - Center Field Distance: " << (*it).getCenterField() << endl;
+            }
         }
     }
     cout << endl << endl;
@@ -327,9 +367,11 @@ int main (int argc, char *argv[])
     Teams.primMST(source_team);
 
     cout << endl << endl;
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamnumber());
 
     // Test Requirement: Planning Vacation 6 - DFS Starting at Fenway 
     cout << "Planning Vacation 6 - DFS Starting at Fenway" << endl;
+    //Teams.FindbyNumber(4).PrintAsDebug(true,true);
     Teams.InitVisited();
     total_miles = 0;
     Teams.DFS(4, total_miles);
@@ -340,6 +382,7 @@ int main (int argc, char *argv[])
 
     // Test Requirement: Planning Vacation 7 - BFS Starting at Coors 
     cout << "Planning Vacation 7 - BFS Starting at Coors" << endl;
+    //Teams.FindbyNumber(9).PrintAsDebug(true,true);
     Teams.InitVisited();
     total_miles = 0;
     Teams.BFS(9, total_miles);

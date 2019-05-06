@@ -45,6 +45,12 @@ TeamDataStore::TeamDataStore()
 void TeamDataStore::load(const string path, bool ItemsAreAdditional)
 {
     //string fullpath = path + "TeamData.csv";
+    if (!ItemsAreAdditional)
+    {
+        MLBTeam *tmp = new MLBTeam();
+        tmp->m_bDeleted = true;
+        m_TeamList.push_back(*tmp);
+    }
     std::ifstream infile(path, ios::in);
     int line_count = 0;
     if (infile.is_open())
