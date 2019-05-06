@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     filesAdded = -1;
     leagueSetting = 0;
 
-    readMLBFile("C:\\Users\\water\\Documents\\GitHub\\ST6R-MLB\\mlb\\data.txt");
+    readMLBFile("../mlb/data.txt");
 
     //Set Stacked Widgets
     ui->primaryStackedWidget->setCurrentIndex(0);
