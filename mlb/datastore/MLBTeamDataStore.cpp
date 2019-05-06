@@ -543,9 +543,9 @@ TeamDataStore::~TeamDataStore()
 int TeamDataStore::PlanTrip(int from, int to)
 {
     std::vector<MLBTeam> teamlist;
-    MLBTeam *dummyzero = new MLBTeam();
-    teamlist.push_back(*dummyzero);
-    delete dummyzero;
+    //MLBTeam *dummyzero = new MLBTeam();
+    //teamlist.push_back(*dummyzero);
+    //delete dummyzero;
     for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         teamlist.push_back(*it);
@@ -587,9 +587,9 @@ const std::vector<TeamEdge> TeamDataStore::PlanMultTrip(int from)
 {
     std::vector<TeamEdge> distances;
     std::vector<MLBTeam> teamlist;
-    MLBTeam *dummyzero = new MLBTeam();
-    teamlist.push_back(*dummyzero);
-    delete dummyzero;
+    //MLBTeam *dummyzero = new MLBTeam();
+    //teamlist.push_back(*dummyzero);
+    //delete dummyzero;
     for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         teamlist.push_back(*it);
@@ -661,9 +661,9 @@ const std::vector<TeamEdge> TeamDataStore::PlanShortestTrip(int from, std::vecto
 {
     std::vector<TeamEdge> distances;
     std::vector<MLBTeam> teamlist;
-    MLBTeam *dummyzero = new MLBTeam();
-    teamlist.push_back(*dummyzero);
-    delete dummyzero;
+    //MLBTeam *dummyzero = new MLBTeam();
+    //teamlist.push_back(*dummyzero);
+    //delete dummyzero;
     for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         teamlist.push_back(*it);
