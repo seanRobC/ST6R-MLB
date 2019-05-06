@@ -1,0 +1,574 @@
+0
+30
+
+Arizona Diamondbacks
+1
+Chase Field
+Phoenix, Arizona
+Grass
+National
+Retro Modern
+Retractable
+48686
+1998
+407
+9
+580
+28
+870
+11
+1115
+20
+650
+23
+300
+
+Atlanta Braves
+2
+SunTrust Park
+Cumberland, Georgia
+Grass
+National
+Retro Modern
+Open
+41149
+2017
+400
+7
+375
+30
+560
+15
+600
+28
+740
+
+Baltimore Orloes
+3
+Oriole Park at Camde Yards
+Baltimore, Maryland
+Grass
+American
+Retro Classic
+Open
+45971
+1992
+410
+30
+50
+21
+90
+
+Boston Red Sox
+4
+Fenway Park
+Boston, Massachusetts
+Grass
+American
+Jewel Box
+Open
+37731
+1912
+420
+18
+195
+15
+1255
+29
+430
+
+Chicago Cubs
+5
+Wrigley Field
+Chicago, Illinois
+Grass
+National
+Jewel Box
+Open
+41268
+1914
+400
+6
+50
+16
+80
+12
+415
+22
+415
+
+Chicago White Sox
+6
+Guaranteed Rate Field
+Chicago, Illinois
+Grass
+American
+Retro Classic
+Open
+40615
+1991
+400
+10
+240
+7
+250
+5
+50
+
+Cincinnati Reds
+7
+Great American Ball Park
+Cincinnati, Ohio
+Grass
+National
+Retro Modern
+Open
+42319
+2003
+404
+22
+260
+8
+225
+27
+790
+2
+375
+26
+310
+
+Cleveland Indians
+8
+Progressive Field
+Cleveland, Ohio
+Grass
+American
+Retro Modern
+Open
+35051
+1994
+410
+22
+115
+10
+90
+7
+225
+
+Colorado Rockies
+9
+Coors Field
+Denver, Colorado
+Grass
+National
+Retro Classic
+Open
+50398
+1995
+415
+12
+560
+28
+650
+1
+580
+23
+830
+
+Detroit Tigers
+10
+Comerica Park
+Detroit, Michigan
+Grass
+American
+Retro Classic
+Open
+41299
+2000
+420
+6
+240
+29
+210
+8
+90
+
+Houston Astros
+11
+Minute Maid Park
+Houston, Texas
+Grass
+American
+Retro Modern
+Retractable
+41168
+2000
+409
+28
+230
+27
+790
+15
+965
+26
+680
+1
+1115
+
+Kansas City Royals
+12
+Kauffman Stadium
+Kansas City, Missouri
+Grass
+American
+Retro Modern
+Open
+37903
+1973
+410
+26
+235
+28
+460
+5
+415
+9
+560
+
+Los Angeles Angels
+13
+Angel Stadium
+Anaheim, California
+Grass
+American
+Retro Modern
+Open
+45477
+1966
+396
+23
+110
+14
+50
+
+Los Angeles Dodgers
+14
+Dodger Stadium
+Los Angeles, California
+Grass
+National
+Modern
+Open
+56000
+1962
+400
+13
+50
+17
+1500
+20
+340
+
+Miami Marlins
+15
+Marlins Park
+Miami, Florida
+Grass
+National
+Contemporary
+Retractable
+36742
+2012
+407
+2
+600
+27
+210
+30
+930
+4
+1255
+11
+965
+
+Milwaukee Brewers
+16
+Miller Park
+Milwaukee, Wisconsin
+Grass
+National
+Retro Modern
+Retractable
+41900
+2001
+400
+29
+430
+5
+80
+17
+300
+
+Minnesota Twins
+17
+Target Field
+Minneapolis, Minnesota
+Grass
+American
+Retro Modern
+Open
+38885
+2010
+404
+14
+1500
+26
+465
+16
+300
+25
+1390
+
+New York Mets
+18
+Citi Field
+Queens, New York
+Grass
+National
+Retro Modern
+Open
+41922
+2009
+408
+4
+195
+19
+50
+
+New York Yankees
+19
+Yankee Stadium
+Bronx, New York
+Grass
+American
+Retro Classic
+Open
+47422
+2009
+408
+22
+315
+21
+80
+18
+50
+
+Oakland Athletics
+20
+Oakland-Alameda County Coliseum
+Oakland, California
+Grass
+American
+Multipurpose
+Open
+47170
+1966
+400
+24
+50
+14
+340
+1
+650
+
+Philadelphia Phillies
+21
+Citizens Bank Park
+Philadelphia, Pennsylvania
+Grass
+National
+Retro Classic
+Open
+43651
+2004
+401
+19
+80
+3
+90
+
+Pittsburgh Pirates
+22
+PNC Park
+Pittsburgh, Pennsylvania
+Grass
+National
+Retro Classic
+Open
+38362
+2001
+399
+30
+195
+29
+225
+8
+115
+7
+260
+19
+315
+
+San Diego Padres
+23
+Petco Park
+San Diego, California
+Grass
+National
+Retro Modern
+Open
+40209
+2004
+396
+9
+830
+1
+300
+13
+110
+
+San Francisco Giants
+24
+AT&T Park
+San Francisco, California
+Grass
+National
+Retro Classic
+Open
+41915
+2000
+399
+25
+680
+20
+50
+
+Seattle Mariners
+25
+Safeco Field
+Seattle, Washington
+Grass
+American
+Retro Modern
+Retractable
+47943
+1999
+401
+29
+2070
+17
+1390
+24
+680
+
+St. Louis Cardinals
+26
+Busch Stadium
+St. Louis, Missouri
+Grass
+National
+Retro Classic
+Open
+45529
+2006
+400
+11
+680
+7
+310
+17
+465
+12
+235
+
+Tampa Bay Rays
+27
+Tropicana Field
+St. Petersburg, Florida
+AstroTurf GameDay Grass
+American
+Multipurpose
+Fixed
+31042
+1990
+404
+7
+790
+15
+210
+11
+790
+
+Texas Rangers
+28
+Globe Life Park in Arlington
+Arlington, Texas
+Grass
+American
+Retro Classic
+Open
+48114
+1994
+400
+1
+870
+12
+460
+2
+740
+11
+230
+9
+650
+
+Toronto Blue Jays
+29
+Rogers Centre
+Toronto, Ontario
+AstroTurf GameDay Grass
+American
+Multipurpose
+Retractable
+49282
+1989
+400
+22
+225
+16
+430
+10
+210
+4
+430
+25
+2070
+
+Washington Nationals
+30
+Nationals Park
+Washington, D.C.
+Grass
+National
+Retro Modern
+Open
+41339
+2008
+402
+3
+50
+22
+195
+2
+560
+15
+930
