@@ -23,13 +23,17 @@ class TeamEdge
 public:
     int m_nTeam;
     int m_nDistance;
+    bool m_bVisited;
     TeamEdge()
-      : m_nTeam(0), m_nDistance(0) {};
+      : m_nTeam(0), m_nDistance(0), m_bVisited(false) {};
     TeamEdge(int teamx, int distancex)
-      : m_nTeam(teamx), m_nDistance(distancex) {};
+      : m_nTeam(teamx), m_nDistance(distancex), m_bVisited(false) {};
     TeamEdge(const TeamEdge &src)
-      : m_nTeam(src.m_nTeam), m_nDistance(src.m_nDistance) {};
+    : m_nTeam(src.m_nTeam), m_nDistance(src.m_nDistance), m_bVisited(src.m_bVisited) {};
     TeamEdge &operator=(const TeamEdge &rhs);
+    void ClearVisited(void) { m_bVisited = false; };
+    void SetVisited(void) { m_bVisited = true; };
+    bool IsVisited(void) { return(m_bVisited); };
 };
 
 struct EdgeGreater
@@ -151,6 +155,16 @@ public:
     void addSouvenir(const string desc, float price);
     bool deleteSouvenir(int number);
     bool updateSouvenir(int number, const string desc, float price);
+
+    // DFS and BFS helpers
+    void ClearVisited(void) { m_bVisited = false; };
+    void SetVisited(void) { m_bVisited = true; };
+    bool IsVisited(void) { return(m_bVisited); };
+    void ClearVisited(int edge) { m_Distances[edge].m_bVisited = false; };
+    void SetVisited(int edge) { m_Distances[edge].m_bVisited = true; };
+    bool IsEdgeVisited(int edge) { return(m_Distances[edge].m_bVisited); };
+    int GetDistance(int edge) { return(m_Distances[edge].m_nDistance); };
+    int GetAdjacentCity(int edge) { return(m_Distances[edge].m_nTeam); };
         
 
 private:
@@ -172,11 +186,12 @@ private:
     vector<TeamEdge> m_Distances;
     std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyName> m_Souvenirs;
     int     m_nHighestSouvenirsNumber;
+    bool    m_bVisited;
 
 
     // private members to prevent use
 
-    // Constructor - used by TeamDataSttore class as a friend to create
+    // Constructor - used by TeamDataStore class as a friend to create
     // restaurant objects from input file
     MLBTeam(int number, const string &teamname, const string &parkname,
             int seatingcapcity, const string &location,

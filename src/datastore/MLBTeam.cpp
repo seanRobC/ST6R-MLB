@@ -19,7 +19,7 @@ MLBTeam::MLBTeam(int number, const string &teamname, const string &parkname,
                    m_sPlayingSurface(surface), m_sLeague(league), m_nYearOpened(yearopen),
                    m_nDistCenterFieldFeet(distcenterfeet), m_nDistCenterFieldMeters(distcentermeters),
                    m_sParkTyplolgy(typology), m_sRoofType(roof), m_bDeleted(deleted),
-                   m_nHighestSouvenirsNumber(highestSouvenir)
+                   m_nHighestSouvenirsNumber(highestSouvenir), m_bVisited(false)
 {
     for (int i = 0; i < distances.size(); i++)
     {
@@ -76,6 +76,7 @@ MLBTeam& MLBTeam::operator=(const MLBTeam& rhs)
    m_Distances = rhs.m_Distances;
    m_Souvenirs = rhs.m_Souvenirs;
    m_nHighestSouvenirsNumber = rhs.m_nHighestSouvenirsNumber;
+   m_bVisited = rhs.m_bVisited;
    return *this;
 }
 
@@ -237,6 +238,6 @@ TeamEdge &TeamEdge::operator=(const TeamEdge &rhs)
     }
     m_nTeam = rhs.m_nTeam;
     m_nDistance = rhs.m_nDistance;
+    m_bVisited = rhs.m_bVisited;
     return *this;
 }
-

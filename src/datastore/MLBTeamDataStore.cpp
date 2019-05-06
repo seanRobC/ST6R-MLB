@@ -22,7 +22,12 @@
 
 using namespace std;
 
-    const int TeamDataStore::max_weight = 999999;
+const int TeamDataStore::max_weight = 999999;
+TeamEdge TeamDataStore::m_DistancesArray[31+1][31+1]; // Adjacency Matrix
+//memset(TeamDataStore::m_DistancesArray, 0 sizeof(MLBTeam::m_DistancesArray));
+//std::vector<std::vector<TeamEdge>> TeamDataStore::m_DistancesArrayV;
+static const int max_level = 8;
+vector<int> Levels[max_level];
 
 //! default constuctor
 //!
@@ -162,6 +167,9 @@ void TeamDataStore::load(const string path, bool ItemsAreAdditional)
     {
         throw std::invalid_argument("Team File Empty");
     }
+
+    // after instantating all of the Teams, including newly added teams - clear and reinit the array
+    InitVisitedArray();
 }
 
 //! TeamDataStore::save - save objects to external CSV file
@@ -289,6 +297,81 @@ bool TeamDataStore::DuplicateNumPresent(int Number)
 }
 
 
+void TeamDataStore::InitVisited(void)
+{
+    for (int team = 1; team <= m_TeamList.size(); team++)
+    {
+        MLBTeam *pTeam = &m_TeamList[team];
+        pTeam->m_bVisited = false;
+        for (int i = 0; i < pTeam->m_Distances.size(); i++)
+        {
+            pTeam->m_Distances[i].m_bVisited = false;
+            //pTeam->m_Distances[i].discovery = false;
+            //pTeam->m_Distances[i].back = false;
+            //pTeam->m_Distances[i].forward = false;
+            //pTeam->m_Distances[i].cross = false;
+        }
+    }
+}
+
+void TeamDataStore::InitVisitedArray(void)
+{
+#if 0
+    for (std::vector<std::vector<TeamEdge>>::iterator it = m_DistancesArrayV.begin(); it != m_DistancesArrayV.end(); ++it)
+    {
+        (*it).clear();
+    }
+
+    std::vector<TeamEdge> vte;
+    TeamEdge te(0,0);
+    for (int i = 0; i < 31; i++)
+    {
+        m_DistancesArrayV.push_back(vte);
+        for (int j = 0; j < 31; j ++)
+        {
+            m_DistancesArrayV[i].push_back(te);
+        }
+    }
+#endif
+
+    for (int i = 1; i < m_TeamList.size(); i++)
+    {
+        for (int j = 1; j < m_TeamList.size(); j++)
+        {
+            m_DistancesArray[i][j].m_nTeam = 0;
+            m_DistancesArray[i][j].m_nDistance = 0;
+            m_DistancesArray[i][j].m_bVisited = false;
+            //m_DistancesArray[i][j].discovery = false;
+            //m_DistancesArray[i][j].back = false;
+            //m_DistancesArray[i][j].forward = false;
+            //m_DistancesArray[i][j].cross = false;
+        }
+    }
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        for (std::vector<TeamEdge>::const_iterator ite = (*it).m_Distances.begin(); ite != (*it).m_Distances.end(); ++ite)
+        {
+            m_DistancesArray[(*it).m_nNumber][(*ite).m_nTeam].m_nDistance = ite->m_nDistance;
+            m_DistancesArray[(*it).m_nNumber][(*ite).m_nTeam].m_nDistance = ite->m_nDistance;
+            m_DistancesArray[(*ite).m_nTeam][(*it).m_nNumber].m_nTeam = ite->m_nTeam;
+            m_DistancesArray[(*ite).m_nTeam][(*it).m_nNumber].m_nTeam = ite->m_nTeam;
+        }
+    }
+#if 0
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        int tnum = (*it).m_nNumber;
+        cout << "Team:" << (*it).m_nNumber << " ";
+        for (int y = 0; y <= Teams.size(); y++)
+        {
+            cout << m_DistancesArray[tnum][y].m_nDistance << " ";
+        }
+        cout << endl;
+    }
+#endif   
+}
+
+
 void TeamDataStore::DijkstraComputePaths(int source, const std::vector<MLBTeam> teamlist, 
                           const adjacency_list_t &adjacency_list,
                           std::vector<int> &min_distance,
@@ -345,8 +428,20 @@ std::list<string> TeamDataStore::DijkstraGetShortestPathTo(int vertex, const std
 }
 
 // Prints shortest paths from src to all other vertices
-void TeamDataStore::primMST(int source_team, const std::vector<MLBTeam> teamlist)
+void TeamDataStore::primMST(int source_team)
 {
+    std::vector<MLBTeam> teamlist;
+    MLBTeam *dummyzero = new MLBTeam();
+    teamlist.push_back(*dummyzero);
+    delete dummyzero;
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        teamlist.push_back(*it);
+    }
+    // Note - this puts each team's data in the vector element that corresponds to the team number.
+    //        if the numbers are discontinuous, this will present a problem
+    sort(teamlist.begin(), teamlist.end(), Cmp_by_teamnumber());
+
     // Create a priority queue to store vertices that
     // are being preinMST.
     std::priority_queue<TeamEdge, std::vector<TeamEdge>, EdgeGreater> pq;
@@ -556,3 +651,228 @@ const std::vector<TeamEdge> TeamDataStore::PlanMultTrip(int from)
 
 }
 
+const std::vector<TeamEdge> TeamDataStore::PlanShortestTrip(int from, std::vector<int> dests, bool ordered)
+{
+    std::vector<TeamEdge> distances;
+    std::vector<MLBTeam> teamlist;
+    MLBTeam *dummyzero = new MLBTeam();
+    teamlist.push_back(*dummyzero);
+    delete dummyzero;
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        teamlist.push_back(*it);
+    }
+    // Note - this puts each team's data in the vector element that corresponds to the team number.
+    //        if the numbers are discontinuous, this will present a problem
+    sort(teamlist.begin(), teamlist.end(), Cmp_by_teamnumber());
+
+    int source_num = 999;
+    int dest_num = 999;
+    int i = 0;
+    // convert source Team number to a vector index
+    for (std::vector<MLBTeam>::const_iterator it = teamlist.begin(); it != teamlist.end(); ++it)
+    {
+        if (it->getNumber() == from)
+        {
+            source_num = i;
+        }
+        i++;
+    }
+    if (source_num != 999)
+    {
+        TeamEdge te(source_num,0);
+        distances.push_back(te);
+        while (source_num != 0)
+        {
+            std::vector<int> min_distance(teamlist.size());
+            std::vector<int> previous(teamlist.size());
+            int mindist = 99999;
+            int minteam = 0;
+            std::vector<int>::iterator minit;
+            DijkstraComputePaths(source_num, teamlist, teamlist[from].GetDistances(), min_distance, previous, teamlist.size());
+            for (std::vector<int>::iterator iti = dests.begin(); iti != dests.end(); iti++)
+            {
+                if (*iti != source_num && mindist > min_distance[*iti])
+                {
+                    bool found = false;
+                    for (std::vector<TeamEdge>::const_iterator it = distances.begin(); it != distances.end(); ++it)
+                    {
+                        if ((*it).m_nTeam == *iti)
+                        {
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                    {
+                        mindist = min_distance[*iti];
+                        minteam = *iti;
+                        minit = iti;
+                    }
+                }
+            }
+            if (minteam != 0)
+            {
+                TeamEdge te(minteam,mindist);
+                distances.push_back(te);
+                dests.erase(minit);
+                source_num = minteam;
+            }
+            else
+            {
+                break;  // no more entries 
+            }
+        }
+
+    }
+    return distances;
+}
+
+
+void TeamDataStore::DFS(const int vertice, int &total_miles)
+{
+    // label v as Visited
+    m_TeamList[vertice].SetVisited();
+    cout << "Visited Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
+
+    // process the edges from this city
+    //vector<CityEdge> dist = m_TeamList[vertice].GetDistances();
+    for (int outedge = 0; outedge < m_TeamList[vertice].GetDistances().size(); outedge++)
+    {
+        int shortest_dist = 99999;
+        int shortest_city = 0;
+        int shortest_edge = 0;
+        for (int edge = 0; edge < m_TeamList[vertice].GetDistances().size(); edge++)
+        {
+            if (!m_TeamList[vertice].IsEdgeVisited(edge))
+            {
+                // edge not visited
+                int adjcity = m_TeamList[vertice].GetAdjacentCity(edge);
+                if (!m_TeamList[adjcity].IsVisited())
+                {
+                    // city not yet visted
+                    if (m_TeamList[vertice].GetDistance(edge) < shortest_dist)
+                    {
+                        shortest_dist = m_TeamList[vertice].GetDistance(edge);
+                        shortest_city = adjcity;
+                        shortest_edge = edge;
+                    }
+                }
+                else
+                {
+                    //cout << "Back edge:" << vertice << ":::" << adjcity << " Miles-" << m_TeamList[vertice].GetDistance(edge) << endl;
+                    //m_TeamList[vertice].SetBack(edge);
+                }
+            }
+        }
+        // visit closest unvisited City, add total mileage, set edge as discovery
+        if (shortest_city != 0)
+        {
+            total_miles += shortest_dist;
+            //m_TeamList[vertice].SetDiscovered(shortest_edge);
+            //m_TeamList[vertice].ClearBack(shortest_edge);
+            m_TeamList[vertice].SetVisited(shortest_edge);
+#if 0
+            cout << "Discovery edge:" << vertice << ":::" << shortest_city << " Miles-" << shortest_dist << endl;
+#endif
+            DFS(shortest_city, total_miles);
+        }
+        else
+        {
+            // No unvisted citys for this vertice, go back to prior vertice
+            break;
+        }
+    }
+}
+
+void TeamDataStore::BFS(const int vertice, int &total_miles)
+{
+    int cur_level = 0;
+    int prev_level;
+
+    int num_teams = m_TeamList.size();
+
+    // label v as Visited
+    m_TeamList[vertice].SetVisited();
+
+    cout << endl << "-------- Level " << cur_level << endl;
+    cout << "Starting Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
+
+    vector<int> Levels[4];
+
+    Levels[0].push_back(vertice);
+    while (!Levels[cur_level].empty())
+    {
+        bool vertices_discovered = false;
+        prev_level = cur_level;
+        cur_level++;
+        cout << endl << "-------- Level " << cur_level << endl;
+        if (cur_level >= max_level)
+        {
+            // error - could have used a vector instead of a fixed size array
+            cout << "======================= !!!!!!!!!!!!!!!!!! ==================" << endl;
+            throw("Too many Levels");
+        }
+
+        for (std::vector<int>::iterator it = Levels[prev_level].begin(); it != Levels[prev_level].end(); it++)
+        {
+            // process the edges from this city in the IncidentArray
+            for (int outedge = 1; outedge <= num_teams; outedge++)
+            {
+                int team_number = *it;
+#if 0
+                TeamEdge test[32];
+                for (int x = 0; x < 32; x++)
+                {
+                    test[x] = m_DistancesArray[team_number][x];
+                }
+#endif
+                if (m_DistancesArray[team_number][outedge].m_nTeam != 0)
+                {
+                    int shortest_dist = 99999;
+                    int shortest_team = 0;
+                    for (int edge = 1; edge <= num_teams; edge++)
+                    {
+                        if (m_DistancesArray[team_number][edge].m_nTeam != 0)
+                        {
+                            if ( (m_DistancesArray[team_number][edge].m_nDistance < shortest_dist) &&
+                                 (!m_DistancesArray[team_number][edge].IsVisited()) )  // edge unexplored
+                            {
+                                shortest_dist = m_DistancesArray[team_number][edge].m_nDistance;
+                                shortest_team = edge;
+                            }
+                        }
+                    }
+
+                    if (shortest_team != 0)
+                    {
+
+                        if (!m_TeamList[shortest_team].IsVisited())
+                        {
+                            //MLBTeam::m_DistancesArray[city_number][shortest_city].SetDiscovered();
+                            m_DistancesArray[team_number][shortest_team].SetVisited();
+                            Levels[cur_level].push_back(shortest_team);
+                            total_miles += shortest_dist;
+                            vertices_discovered = true;
+                            m_TeamList[shortest_team].SetVisited();
+                            cout << "Discovered Vertice #" << shortest_team << " :" << m_TeamList[shortest_team].getStadiumName() << " Parent#:" << team_number << "  Miles - " << shortest_dist << endl;
+                        }
+                        else
+                        {
+                            //m_DistancesArray[city_number][shortest_team].SetBack();
+                            m_DistancesArray[team_number][shortest_team].SetVisited();
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        if (!vertices_discovered)
+        {
+            cout << "No Undicovered Vertices Remaining" << endl;
+            break;  // exit - all vertices discovered in prior level
+        }
+    }
+}

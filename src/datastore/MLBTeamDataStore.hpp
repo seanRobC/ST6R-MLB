@@ -43,6 +43,13 @@ public:
     void save(const string path);
     void load_additional(const string path);
 
+    // DFS and BFS Helpers
+    // Note extra row/column to allow 1 based vertice numbers
+    static TeamEdge m_DistancesArray[31+1][31+1]; // Adjacency Array
+    static std::vector<std::vector<TeamEdge>> m_DistancesArrayV; // Adjacency Array
+    void InitVisited(void);
+    void InitVisitedArray(void);
+
 
     void DijkstraComputePaths(int source,const std::vector<MLBTeam> teamlist,
                               const adjacency_list_t &adjacency_list,
@@ -51,8 +58,11 @@ public:
 
     std::list<string> DijkstraGetShortestPathTo(int vertex, const std::vector<MLBTeam> teamlist, const std::vector<int> &previous);
     int PlanTrip(int from, int to);
+    const std::vector<TeamEdge> PlanShortestTrip(int from, std::vector<int> dests, bool ordered);
     const std::vector<TeamEdge> PlanMultTrip(int source_team);
-    void primMST(int source_team, const std::vector<MLBTeam> teamlist);
+    void primMST(int source_team);
+    void DFS(const int vertice, int &total_miles);
+    void BFS(const int vertice, int &total_miles);
 
     std::vector<MLBTeam> m_TeamList;
     static const int max_weight;

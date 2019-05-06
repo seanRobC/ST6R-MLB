@@ -288,6 +288,64 @@ int main (int argc, char *argv[])
         source_team = dest_team;
     }
     cout << "Total Miles Traveled: " << total_miles << endl;
+    cout << endl << endl;
 
+    // Test Requirement: Planning Vacation 4 - Shortest Trip visiting selected teams from an selected starting team 
+    cout << "Planning Vacation 4 - Shortest Trip visiting selected teams from an selected starting team" << endl;
+    source_team = 13;
+
+    std::vector<int> vac_list4;
+    vac_list4.push_back(12);
+    vac_list4.push_back(4);
+    vac_list4.push_back(8);
+    vac_list4.push_back(22);
+
+    std::vector<TeamEdge> distances4 = Teams.PlanShortestTrip(source_team, vac_list4, false);
+
+    source_team = 999;
+    total_miles = 0;
+    for (std::vector<TeamEdge>::iterator it = distances4.begin(); it != distances4.end(); ++it)
+    {
+        if (source_team == 999)
+        {
+            source_team = it->m_nTeam;
+            continue;
+        }
+        dest_team = it->m_nTeam;
+        int miles = it->m_nDistance;
+        total_miles += miles;
+        cout << "Distance from " << Teams.FindbyNumber(source_team).getStadiumName() << " to "  
+             << Teams.FindbyNumber(dest_team).getStadiumName() <<  " " << miles << " miles" << endl;
+        source_team = dest_team;
+    }
+    cout << "Total Miles Traveled: " << total_miles << endl;
+    cout << endl << endl;
+
+    // Test Requirement: Planning Vacation 5 - Minimum Spanning Tree (MST) using Primm's Algorithm 
+    cout << "Planning Vacation 5 - Minimum Spanning Tree (MST) using Primm's Algorithm starting at Angels Stadium" << endl;
+    source_team = 13;
+    Teams.primMST(source_team);
+
+    cout << endl << endl;
+
+    // Test Requirement: Planning Vacation 6 - DFS Starting at Fenway 
+    cout << "Planning Vacation 6 - DFS Starting at Fenway" << endl;
+    Teams.InitVisited();
+    total_miles = 0;
+    Teams.DFS(4, total_miles);
+    cout << endl;
+    cout << "Total Miles: " << total_miles;
+
+    cout << endl << endl;
+
+    // Test Requirement: Planning Vacation 7 - BFS Starting at Coors 
+    cout << "Planning Vacation 7 - BFS Starting at Coors" << endl;
+    Teams.InitVisited();
+    total_miles = 0;
+    Teams.BFS(9, total_miles);
+    cout << endl;
+    cout << "Total Miles: " << total_miles;
+
+    cout << endl << endl;
 }
 
