@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
 
     //for (std::list<Restaurant>::iterator it = Restaurants.list.begin(); it != Restaurants.list.end(); ++it)
 
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
        cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -75,8 +75,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 4
     cout << "Sort by Team Name - Test Requirement 4" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_teamname());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamname());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -86,8 +86,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 5
     cout << "Sort by Stadium Name - Test Requirement 5" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_stadiumname());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_stadiumname());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -97,8 +97,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 6
     cout << "Sort by Stadium Name - American League Only - Test Requirement 6" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_stadiumname());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_stadiumname());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getLeague() == "American")
         {
@@ -111,8 +111,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 7
     cout << "Sort by Team Name - National League Only - Test Requirement 7" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_teamname());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamname());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getLeague() == "National")
         {
@@ -125,8 +125,8 @@ int main (int argc, char *argv[])
 
     // Test Requiement 8
     cout << "Sort by Park Typology - Test Requirement 8" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_typology());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_typology());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -136,9 +136,9 @@ int main (int argc, char *argv[])
 
     // Test Requirement 9
     cout << "Sort by Team Name - Open Roof Only - Test Requirement 9" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_teamname());
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_teamname());
     int count_open = 0;
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getRoofType() == "Open")
         {
@@ -153,8 +153,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 10
     cout << "Sort by Year Park Opened - Test Requirement 10" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_yearopen());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_yearopen());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -164,9 +164,9 @@ int main (int argc, char *argv[])
 
     // Test Requirement 11
     cout << "Sort by Park Capacity - Test Requirement 11" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_seatcapacity());
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_seatcapacity());
     int total_capacity = 0;
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -178,8 +178,8 @@ int main (int argc, char *argv[])
 
     // Test Requirement 12
     cout << "Display Park(s) with greatest distance to center field - Test Requirement 12" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_distcenterfield());
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_distcenterfield());
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         cout << "#" << (*it).getNumber() << "  Team name:" << (*it).getTeamName() << " - Stadium Name: " << (*it).getStadiumName() <<
                 " - Seats: " << (*it).getCapacity() <<  " - Typology: " << (*it).getTypology() << 
@@ -187,14 +187,14 @@ int main (int argc, char *argv[])
     }
     cout << "-------------------------------------------" << endl;
     int greatest_distance = 0;
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getCenterField() > greatest_distance)
         {
             greatest_distance = (*it).getCenterField();
         }
     }
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getCenterField() == greatest_distance)
         {
@@ -207,9 +207,9 @@ int main (int argc, char *argv[])
 
     // Test Requirement 13
     cout << "Display Park(s) with smallest distance to center field - Test Requirement 13" << endl;
-    sort(Teams.list.begin(), Teams.list.end(), Cmp_by_seatcapacity());
+    sort(Teams.m_TeamList.begin(), Teams.m_TeamList.end(), Cmp_by_seatcapacity());
     int smallest_distance = 9999;
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getCenterField() < smallest_distance)
         {
@@ -217,7 +217,7 @@ int main (int argc, char *argv[])
             smallest_distance = (*it).getCenterField();
         }
     }
-    for (std::vector<MLBTeam>::iterator it = Teams.list.begin(); it != Teams.list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = Teams.m_TeamList.begin(); it != Teams.m_TeamList.end(); ++it)
     {
         if ((*it).getCenterField() == smallest_distance)
         {
@@ -227,58 +227,67 @@ int main (int argc, char *argv[])
         }
     }
     cout << endl << endl;
-    
-#if 0
-    cout << endl << endl;
-    cout << "Test Plan a Trip - requirement #3 - start at Saddleback, visit 10 Restaurants" << endl;
-    int myTrip3x = Trips.StoreTripNumRest("Trip Test Req3", 0, 10, Restaurants, Users.list.front());
-    Trip &myTrip3 = Trips.FindbyNumber(myTrip3x);
-    myTrip3.PrintAsDebug(true);
-    cout << "--------------------" << endl << endl;
 
+    // Test Requirement: Planning Vacation 1 - Distance to arbitrary team
+    cout << "Planning Vacation 1 - Distance to arbitrary team" << endl;
+    int source_team = 13;
+    int dest_team = 5;
+    cout << "Distance from " << Teams.FindbyNumber(source_team).getStadiumName() << " to "  
+         << Teams.FindbyNumber(dest_team).getStadiumName() <<  " " << Teams.PlanTrip(source_team,dest_team) << " miles" << endl;
     cout << endl << endl;
-    cout << "Test Plan a Trip - requirement #4 - start at Dominos, visit N (5) Restaurants" << endl;
-    int myTrip4x = Trips.StoreTripNumRest("Trip Test Req4", 3, 5, Restaurants, Users.list.front());
-    Trip &myTrip4 = Trips.FindbyNumber(myTrip4x);
-    myTrip4.PrintAsDebug(true);
-    cout << "--------------------" << endl << endl;
 
-    cout << endl << endl;
-    cout << "Test Plan a Trip - requirement #5a - start at Saddleback, visit selected Restaurants" << endl;
-    vector<int> myrests5a = { 2, 6, 3, 1, 8 };
-    int myTrip5ax = Trips.StoreTrip("Trip Test Req5a", myrests5a, Restaurants, Users.list.front(), true);
-    Trip &myTrip5a = Trips.FindbyNumber(myTrip5ax);
-    myTrip5a.PrintAsDebug(true);
-    cout << "--------------------" << endl << endl;
+    // Test Requirement: Planning Vacation 2 - Distance to lists of arbitrary teams
+    cout << "Planning Vacation 2 - Distance to lists of arbitrary teams" << endl;
+    std::vector<int> vac_list;
+    vac_list.push_back(12);
+    vac_list.push_back(4);
+    vac_list.push_back(8);
+    vac_list.push_back(22);
 
-    cout << endl << endl;
-    cout << "Test Plan a Trip - requirement #5b - visit selected Restaurants" << endl;
-    vector<int> myrests5b = { 2, 9, 3, 1, 4, 8 };
-    int myTrip5bx = Trips.StoreTrip("Trip Test Req5b", myrests5b, Restaurants, Users.list.front(), false);
-    Trip &myTrip5b = Trips.FindbyNumber(myTrip5bx);
-    myTrip5b.PrintAsDebug(true);
-    cout << "--------------------" << endl << endl;
-
-    cout << "Add  2 more restaurants to Restaurants list" << endl;
-    Restaurants.load_additional("./ExtraRestaurantData.csv");
-    Restaurants.load("./ExtraStacksRestaurantData.csv", true);  // verify dupes do not get loaded
-    Restaurants.save("./RestaurantDataStore.csv.tmp2");
-    cout << endl << endl;
-    cout << "Test Plan a Trip - requirement #6 - start at Saddleback, visit 12 Restaurants" << endl;
-    int myTrip6x = Trips.StoreTripNumRest("Trip Test Req6", 0, 12, Restaurants, Users.list.front());
-    Trip &myTrip6 = Trips.FindbyNumber(myTrip6x);
-    myTrip6.PrintAsDebug(true);
-    cout << "--------------------" << endl << endl;
-
-    for (MyDblLinkList<User>::iterator it = Users.list.begin(); it != Users.list.end(); ++it)
+    source_team = 999;
+    dest_team = 999;
+    int total_miles = 0;
+    for (std::vector<int>::const_iterator it = vac_list.begin(); it != vac_list.end(); ++it)
     {
-        cout << "User name:" << (*it).GetName() << " Total Purchases $" << (*it).GetTotalPurchase() << endl;
+        if (source_team == 999)
+        {
+            source_team = *it;
+            continue;
+        }
+        dest_team = *it;
+        int miles = Teams.PlanTrip(source_team,dest_team);
+        total_miles += miles;
+        cout << "Distance from " << Teams.FindbyNumber(source_team).getStadiumName() << " to "  
+             << Teams.FindbyNumber(dest_team).getStadiumName() <<  " " << miles << " miles" << endl;
+        source_team = dest_team;
     }
-    cout << endl << endl;                      // range-for-loop to print Restaurants
+    cout << "Total Miles Traveled: " << total_miles << endl;
+    cout << endl << endl;
 
-#endif
+    // Test Requirement: Planning Vacation 3 - Distance to all teams from an arbitrary team (Detroit Tigers - Comerica)
+    cout << "Planning Vacation 3 - Distance to all teams from an arbitrary team (Detroit Tigers - Comerica)" << endl;
+    source_team = 10;
+    dest_team = 999;
+    total_miles = 0;
 
-    //Users.printAsDebug(true, true);
-    //system("ls -l");
+    std::vector<TeamEdge> distances = Teams.PlanMultTrip(source_team);
+
+    source_team = 999;
+    for (std::vector<TeamEdge>::iterator it = distances.begin(); it != distances.end(); ++it)
+    {
+        if (source_team == 999)
+        {
+            source_team = it->m_nTeam;
+            continue;
+        }
+        dest_team = it->m_nTeam;
+        int miles = it->m_nDistance;
+        total_miles += miles;
+        cout << "Distance from " << Teams.FindbyNumber(source_team).getStadiumName() << " to "  
+             << Teams.FindbyNumber(dest_team).getStadiumName() <<  " " << miles << " miles" << endl;
+        source_team = dest_team;
+    }
+    cout << "Total Miles Traveled: " << total_miles << endl;
+
 }
 

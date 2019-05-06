@@ -14,8 +14,13 @@
 #include <list>
 #include <vector>
 #include <bits/stdc++.h>
+#include <queue>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
+
+typedef std::vector<TeamEdge> adjacency_list_t;
 
 //! TeamDataStore - internal storage for Team objects
 //!
@@ -31,14 +36,26 @@ public:
 
     void printAsDebug(bool printeol, bool printcontent) const;
     MLBTeam &FindbyNumber(int Number);
-    std::vector<MLBTeam>::const_iterator getBeginIterator(void) {return list.cbegin();};
-    std::vector<MLBTeam>::const_iterator getEndIterator(void) {return list.cend();};
+    std::vector<MLBTeam>::const_iterator getBeginIterator(void) {return m_TeamList.cbegin();};
+    std::vector<MLBTeam>::const_iterator getEndIterator(void) {return m_TeamList.cend();};
 
     void load(const string path, bool ItemsAreAdditional = false);
     void save(const string path);
     void load_additional(const string path);
 
-    std::vector<MLBTeam> list;
+
+    void DijkstraComputePaths(int source,const std::vector<MLBTeam> teamlist,
+                              const adjacency_list_t &adjacency_list,
+                              std::vector<int> &min_distance,
+                              std::vector<int> &previous, int num_vertices);
+
+    std::list<string> DijkstraGetShortestPathTo(int vertex, const std::vector<MLBTeam> teamlist, const std::vector<int> &previous);
+    int PlanTrip(int from, int to);
+    const std::vector<TeamEdge> PlanMultTrip(int source_team);
+    void primMST(int source_team, const std::vector<MLBTeam> teamlist);
+
+    std::vector<MLBTeam> m_TeamList;
+    static const int max_weight;
 
 private:
     bool DuplicateNumPresent(int Number);
@@ -47,4 +64,6 @@ private:
     TeamDataStore(const TeamDataStore& src);
 
     // Assignment operator
-    TeamDataStore& operator=(const TeamDataStore& src); } ;
+    TeamDataStore& operator=(const TeamDataStore& src); 
+
+} ;

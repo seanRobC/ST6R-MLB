@@ -14,27 +14,46 @@
 
 using namespace std;
 
+struct EdgeGreater;
+struct EdgeGreaterRev;
+
 // used to describe the distance (edges) between Teams/Parks
 class TeamEdge
 {
 public:
     int m_nTeam;
     int m_nDistance;
-    bool m_bVisited;
-    bool m_bDiscovery;
-    bool m_bBack;
-    void ClearVisited(void) { m_bVisited = false; };
-    void SetVisited(void) { m_bVisited = true; };
-    bool IsVisited(void) { return(m_bVisited); };
-    void ClearDiscovered(void) { m_bDiscovery = false; };
-    void SetDiscovered(void) { m_bDiscovery = true; };
-    void ClearBack(void) { m_bBack = false; };
-    void SetBack(void) { m_bBack = true; };
+    TeamEdge()
+      : m_nTeam(0), m_nDistance(0) {};
+    TeamEdge(int teamx, int distancex)
+      : m_nTeam(teamx), m_nDistance(distancex) {};
+    TeamEdge(const TeamEdge &src)
+      : m_nTeam(src.m_nTeam), m_nDistance(src.m_nDistance) {};
+    TeamEdge &operator=(const TeamEdge &rhs);
+};
+
+struct EdgeGreater
+{
+    bool operator()(const TeamEdge &s1, const TeamEdge &s2) const
+    {
+        return s1.m_nDistance > s2.m_nDistance;
+    }
+};
+
+struct EdgeGreaterRev
+{
+    bool operator()(const TeamEdge &s1, const TeamEdge &s2) const
+    {
+        return s1.m_nDistance < s2.m_nDistance;
+    }
 };
 
 class MLB_Souvenir
 {
 public:
+    MLB_Souvenir()
+      :  m_bInitialized(false) {};
+ 
     MLB_Souvenir(const int number, const string &name,
                  const float price, const bool deleted)
         : m_nNumber(number), m_bDeleted(deleted),
@@ -57,12 +76,29 @@ public:
     bool    m_bInitialized;
 };
 
+struct SouvenirbyName
+{
+    bool operator()(const MLB_Souvenir &s1, const MLB_Souvenir &s2)
+    {
+        return s1.m_sSouvenirName > s2.m_sSouvenirName;
+    }
+};
+
+struct SouvenirbyNameRev
+{
+    bool operator()(const MLB_Souvenir &s1, const MLB_Souvenir &s2)
+    {
+        return s1.m_sSouvenirName < s2.m_sSouvenirName;
+    }
+};
+
 class MLBTeam
 {
 friend class TeamDataStore;
 public:
     // Constructor
-    MLBTeam() { m_nNumber = -1; m_bInitialized = false; };
+    MLBTeam()
+     : m_nNumber(0), m_bInitialized(false) { std::vector<TeamEdge> x; m_Distances = x; };
 
     // Destructor
     ~MLBTeam() {};
@@ -88,6 +124,8 @@ public:
     const string &getTypology(void) const {return m_sParkTyplolgy;};
     const string &getRoofType(void) const {return m_sRoofType;};
 
+    const vector<TeamEdge> &GetDistances(void) const { return m_Distances; };
+
     // Setters
     void updateTeamName(const string &name) { m_sTeamName = name; };
     void updateStadiumName(const string &park) { m_sParkName = park; };
@@ -101,7 +139,7 @@ public:
     void updateDistCenterFieldMeters(int centerfieldmtrs) { m_nDistCenterFieldMeters =centerfieldmtrs; };
     void updateTypology(const string &typology) { m_sParkTyplolgy = typology; };
     void updateRoofType(const string &roof) { m_sRoofType = roof; };
-    void updateSouvenirs(const vector<MLB_Souvenir> &souvenirs) { m_Souvenirs = souvenirs; };
+    // not used - void updateSouvenirs(const vector<MLB_Souvenir> &souvenirs) { m_Souvenirs = souvenirs; };
 
     // Helper functions for maintenance
     bool IsDeleted(void) const {return m_bDeleted;};
@@ -109,7 +147,7 @@ public:
     bool PrintAsDebug(bool print_endl, bool print_detail) const;
 
     // Souvenir Accessors
-    const vector<MLB_Souvenir> &GetSouvenirs(void) const {return m_Souvenirs;};
+    void GetSouvenirs(vector<MLB_Souvenir> &souvenirs) const;
     void addSouvenir(const string desc, float price);
     bool deleteSouvenir(int number);
     bool updateSouvenir(int number, const string desc, float price);
@@ -132,7 +170,7 @@ private:
     bool    m_bInitialized;
     bool    m_bDeleted;
     vector<TeamEdge> m_Distances;
-    vector<MLB_Souvenir> m_Souvenirs;
+    std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyName> m_Souvenirs;
     int     m_nHighestSouvenirsNumber;
 
 

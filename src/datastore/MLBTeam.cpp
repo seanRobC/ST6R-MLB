@@ -19,11 +19,15 @@ MLBTeam::MLBTeam(int number, const string &teamname, const string &parkname,
                    m_sPlayingSurface(surface), m_sLeague(league), m_nYearOpened(yearopen),
                    m_nDistCenterFieldFeet(distcenterfeet), m_nDistCenterFieldMeters(distcentermeters),
                    m_sParkTyplolgy(typology), m_sRoofType(roof), m_bDeleted(deleted),
-                   m_Souvenirs(souvenirs), m_nHighestSouvenirsNumber(highestSouvenir)
+                   m_nHighestSouvenirsNumber(highestSouvenir)
 {
     for (int i = 0; i < distances.size(); i++)
     {
         m_Distances.push_back(distances[i]);
+    }
+    for (int i = 0; i < souvenirs.size(); i++)
+    {
+        m_Souvenirs.push(souvenirs[i]);  // sorted by name
     }
     m_bInitialized = true;
 }
@@ -97,13 +101,16 @@ bool MLBTeam::PrintAsDebug(bool print_endl, bool print_detail) const
 
                   if (m_Souvenirs.size() > 0)
                   {
-                      for (std::vector<MLB_Souvenir>::const_iterator itm = m_Souvenirs.begin();
-                                                                 itm != m_Souvenirs.end(); itm++)
+                      std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyName> Souvenirs = m_Souvenirs;
+                      MLB_Souvenir tmp;
+                      while (Souvenirs.size() > 0)
                       {
-                          cout << " #: " << (*itm).m_nNumber
-                               << " Name: " << (*itm).m_sSouvenirName
-                               << " Price: "<< (*itm).m_fSouvenirPrice
-                               << " Deleted: " << (*itm).m_bDeleted << endl;
+                          tmp = Souvenirs.top();
+                          Souvenirs.pop();
+                          cout << " #: " << tmp.m_nNumber
+                               << " Name: " << tmp.m_sSouvenirName
+                               << " Price: "<< tmp.m_fSouvenirPrice
+                               << " Deleted: " << tmp.m_bDeleted << endl;
                       }
                   }
         }
@@ -125,13 +132,16 @@ bool MLBTeam::PrintAsDebug(bool print_endl, bool print_detail) const
 
                 if (m_Souvenirs.size() > 0)
                 {
-                    for (std::vector<MLB_Souvenir>::const_iterator itm = m_Souvenirs.begin();
-                                                               itm != m_Souvenirs.end(); itm++)
+                    std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyName> Souvenirs = m_Souvenirs;
+                    MLB_Souvenir tmp;
+                    while (Souvenirs.size() > 0)
                     {
-                        cout << " #: " << (*itm).m_nNumber
-                             << " Name: " << (*itm).m_sSouvenirName
-                             << " Price: "<< (*itm).m_fSouvenirPrice
-                             << " Deleted: " << (*itm).m_bDeleted;
+                        tmp = Souvenirs.top();
+                        Souvenirs.pop();
+                        cout << " #: " << tmp.m_nNumber
+                             << " Name: " << tmp.m_sSouvenirName
+                             << " Price: "<< tmp.m_fSouvenirPrice
+                             << " Deleted: " << tmp.m_bDeleted;
                     }
                 }
                 cout << endl;
@@ -142,38 +152,65 @@ bool MLBTeam::PrintAsDebug(bool print_endl, bool print_detail) const
     return false;
 }
 
+void MLBTeam::GetSouvenirs(vector<MLB_Souvenir> &souvenirs) const
+{
+    std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyName> Souvenirs = m_Souvenirs;
+    MLB_Souvenir tmp;
+    while (Souvenirs.size () > 0)
+    {
+        souvenirs.push_back(Souvenirs.top());
+        Souvenirs.pop();
+    }
+}
+
 void MLBTeam::addSouvenir(const string desc, float price)
 {
     MLB_Souvenir tmp(++m_nHighestSouvenirsNumber, desc, price, false);
-    m_Souvenirs.push_back(tmp);
+    m_Souvenirs.push(tmp);
 }
 
 bool MLBTeam::deleteSouvenir(int number)
 {
-    for (std::vector<MLB_Souvenir>::const_iterator itm = m_Souvenirs.begin();
-                                               itm != m_Souvenirs.end(); itm++)
+    bool retcode = false;
+    std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyNameRev> RevSouvenirs;
+    MLB_Souvenir tmp;
+    while (m_Souvenirs.size() > 0 && m_Souvenirs.top().m_nNumber != number)
     {
-        if ((*itm).m_nNumber == number)
-        {
-            m_Souvenirs.erase(itm);
-            return true;
-        }
+        retcode = true;
+        m_Souvenirs.pop();  // delete the matching entry
+        break;
     }
-    return false;
+    while (RevSouvenirs.size () > 0)
+    {
+        tmp = RevSouvenirs.top();
+        RevSouvenirs.pop();
+        m_Souvenirs.push(tmp);
+    }
+    return retcode;
 }
 bool MLBTeam::updateSouvenir(int number, const string desc, float price)
 {
-    for (std::vector<MLB_Souvenir>::iterator itm = m_Souvenirs.begin();
-                                               itm != m_Souvenirs.end(); itm++)
+    bool retcode = false;
+    std::priority_queue<MLB_Souvenir, std::vector<MLB_Souvenir>, SouvenirbyNameRev> RevSouvenirs;
+    MLB_Souvenir tmp;
+    while (m_Souvenirs.size() > 0 && m_Souvenirs.top().m_nNumber != number)
     {
-        if ((*itm).m_nNumber == number)
-        {
-            (*itm).m_sSouvenirName = desc;
-            (*itm).m_fSouvenirPrice = price;
-            return true;
-        }
+        retcode = true;
+        tmp = m_Souvenirs.top();
+        tmp.m_sSouvenirName = desc;
+        tmp.m_fSouvenirPrice = price;
+
+        m_Souvenirs.pop();  // delete the matching entry
+        m_Souvenirs.push(tmp);  // add back the new entry
+        break;
     }
-    return false;
+    while (RevSouvenirs.size () > 0)
+    {
+        tmp = RevSouvenirs.top();
+        RevSouvenirs.pop();
+        m_Souvenirs.push(tmp);
+    }
+    return retcode;
 }
 
 
@@ -189,6 +226,17 @@ MLB_Souvenir& MLB_Souvenir::operator=(const MLB_Souvenir& rhs)
     m_fSouvenirPrice =  rhs.m_fSouvenirPrice;
     m_bInitialized   =  rhs.m_bInitialized;
 
+    return *this;
+}
+
+TeamEdge &TeamEdge::operator=(const TeamEdge &rhs)
+{
+    if (this == &rhs)
+    {
+        return *this;
+    }
+    m_nTeam = rhs.m_nTeam;
+    m_nDistance = rhs.m_nDistance;
     return *this;
 }
 

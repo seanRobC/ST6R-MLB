@@ -1,8 +1,8 @@
 /**
  * CS1D - MLB
  *
- * Implements a data storage mechanism for User objects. These
- * objects are contained in a doubly linked list that supports
+ * Implements a data storage mechanism for Team objects. These
+ * objects are contained in a vector that supports
  * iterators and a comparable interface
  *
  * @author   edt
@@ -16,8 +16,13 @@
 #include <ostream>
 #include <iostream>
 #include <list>
+#include <queue>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
+
+    const int TeamDataStore::max_weight = 999999;
 
 //! default constuctor
 //!
@@ -96,13 +101,10 @@ void TeamDataStore::load(const string path, bool ItemsAreAdditional)
                 if (nDistances > 0)
                 {
                     TeamEdge tmp;
-                    while(it < (8 + 2*nDistances))
+                    while(it < (14 + 2*nDistances))
                     {
                         tmp.m_nTeam = std::stoi(commaSeparated[it]);
                         tmp.m_nDistance = std::stof(commaSeparated[it+1]);
-                        tmp.m_bVisited = false;
-                        tmp.m_bDiscovery = false;
-                        tmp.m_bBack = false;
                         Distances.push_back(tmp);
                         it += 2;
                     }
@@ -148,7 +150,7 @@ void TeamDataStore::load(const string path, bool ItemsAreAdditional)
                                  Distances,
                                  Souvenirs,
                                  nHighestSouvenirsNumber);
-                list.push_back(*pTeam);
+                m_TeamList.push_back(*pTeam);
             }
         }
     }
@@ -176,7 +178,7 @@ void TeamDataStore::save(const string path)
     std::ofstream outfile(path, ios::trunc);
     if (outfile.is_open())
     {
-        for (std::vector<MLBTeam>::iterator it = list.begin(); it != list.end(); it++)
+        for (std::vector<MLBTeam>::iterator it = m_TeamList.begin(); it != m_TeamList.end(); it++)
         {
             line_count++;
 
@@ -209,8 +211,10 @@ void TeamDataStore::save(const string path)
             outfile << num_Souvenirs << ",";
             if (num_Souvenirs > 0)
             {
-                for (std::vector<MLB_Souvenir>::const_iterator itm = (*it).m_Souvenirs.begin();
-                                                           itm != (*it).m_Souvenirs.end(); itm++)
+                std::vector<MLB_Souvenir> Souvenirs;
+                (*it).GetSouvenirs(Souvenirs);
+                for (std::vector<MLB_Souvenir>::const_iterator itm = Souvenirs.begin();
+                                                           itm != Souvenirs.end(); itm++)
                 {
                     outfile << (*itm).m_nNumber << ",";
                     outfile << (*itm).m_sSouvenirName << ",";
@@ -252,14 +256,14 @@ void TeamDataStore::load_additional(const string path)
 //! \return Team&amp; - pointer to Team or NULL if not found
 MLBTeam &TeamDataStore::FindbyNumber(int Number)
 {
-    for (std::vector<MLBTeam>::iterator it = list.begin(); it != list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         if ( (*it).m_nNumber == Number)
         {
             return *it;
         }
     }
-    return *(list.end());  // never reached  - should throw exception
+    return *(m_TeamList.end());  // never reached  - should throw exception
 }
 
 //! TeamDataStore::DuplicateNumPresent - internal helper to determine if
@@ -273,7 +277,7 @@ MLBTeam &TeamDataStore::FindbyNumber(int Number)
 bool TeamDataStore::DuplicateNumPresent(int Number)
 {
     bool dupe_found = false;
-    for (std::vector<MLBTeam>::iterator it = list.begin(); it != list.end(); ++it)
+    for (std::vector<MLBTeam>::iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         if ( (*it).m_nNumber == Number)
         {
@@ -282,6 +286,134 @@ bool TeamDataStore::DuplicateNumPresent(int Number)
         }
     }
     return dupe_found;
+}
+
+
+void TeamDataStore::DijkstraComputePaths(int source, const std::vector<MLBTeam> teamlist, 
+                          const adjacency_list_t &adjacency_list,
+                          std::vector<int> &min_distance,
+                          std::vector<int> &previous, int num_vertices)
+{
+    int n = num_vertices + 1; //adjacency_list.size();
+    min_distance.clear();
+    min_distance.resize(n, max_weight);
+    min_distance[source] = 0;
+    previous.clear();
+    previous.resize(n, -1);
+    // we use greater instead of less to turn max-heap into min-heap
+    std::priority_queue<TeamEdge, std::vector<TeamEdge>, EdgeGreater>  vertex_queue;
+    vertex_queue.push(TeamEdge(source, min_distance[source]));
+
+    while (!vertex_queue.empty())
+    {
+        int dist = vertex_queue.top().m_nDistance;
+        int u = vertex_queue.top().m_nTeam;
+        vertex_queue.pop();
+
+    	// Because we leave old copies of the vertex in the priority queue
+    	// (with outdated higher distances), we need to ignore it when we come
+    	// across it again, by checking its distance against the minimum distance
+    	if (dist > min_distance[u])
+    	    continue;
+
+        // Visit each edge exiting u
+    	const std::vector<TeamEdge> &neighbors = teamlist[u].m_Distances;
+        for (std::vector<TeamEdge>::const_iterator neighbor_iter = neighbors.begin();
+             neighbor_iter != neighbors.end();
+             neighbor_iter++)
+        {
+            int v = neighbor_iter->m_nTeam;
+            int weight = neighbor_iter->m_nDistance;
+            int distance_through_u = dist + weight;
+    	    if (distance_through_u < min_distance[v])
+            {
+    	        min_distance[v] = distance_through_u;
+    	        previous[v] = u;
+    	        vertex_queue.push(TeamEdge(v, min_distance[v]));
+    	    }
+        }
+    }
+}
+
+
+std::list<string> TeamDataStore::DijkstraGetShortestPathTo(int vertex, const std::vector<MLBTeam> teamlist, const std::vector<int> &previous)
+{
+    std::list<string> path;
+    for ( ; vertex != -1; vertex = previous[vertex])
+        path.push_front(teamlist[vertex].getStadiumName());
+    return path;
+}
+
+// Prints shortest paths from src to all other vertices
+void TeamDataStore::primMST(int source_team, const std::vector<MLBTeam> teamlist)
+{
+    // Create a priority queue to store vertices that
+    // are being preinMST.
+    std::priority_queue<TeamEdge, std::vector<TeamEdge>, EdgeGreater> pq;
+
+    // Create a vector for keys and initialize all
+    // keys as infinite (INF)
+    vector<int> key(teamlist.size(), max_weight);
+
+    // To store parent array which in turn store MST
+    vector<int> parent(teamlist.size(), -1);
+
+    // To keep track of vertices included in MST
+    vector<bool> inMST(teamlist.size(), false);
+
+    // Insert source itself in priority queue and initialize
+    // its key as 0.
+    pq.push(TeamEdge(source_team, 0));
+    key[source_team] = 0;
+
+    /* Looping till priority queue becomes empty */
+    while (!pq.empty())
+    {
+        // The first vertex in pair is the minm_TeamListimum key
+        // vertex, extract it from priority queue.
+        // vertex label is stored in second of pair (it
+        // has to be done this way to keep the vertices
+        // sorted key (key must be first item
+        // in pair)
+        int u = pq.top().m_nTeam;
+        pq.pop();
+
+        inMST[u] = true;  // Include vertex in MST
+
+        // 'i' is used to get all adjacent vertices of a vertex
+        for (std::vector<TeamEdge>::const_iterator i = teamlist[u].GetDistances().begin(); i != teamlist[u].GetDistances().end(); ++i)
+        {
+            // Get vertex label and weight of current adjacent
+            // of u.
+            int v = (*i).m_nTeam;
+            int weight = (*i).m_nDistance;
+
+            //  If v is not in MST and weight of (u,v) is smaller
+            // than current key of v
+            if (inMST[v] == false && key[v] > weight)
+            {
+                // Updating key of v
+                key[v] = weight;
+                pq.push(TeamEdge(v, weight));
+                parent[v] = u;
+            }
+        }
+    }
+
+    int total_mileage = 0;
+    cout << "Minimum Spanning Tree (MST) starting at " << teamlist[source_team].getStadiumName() << " : " << endl;
+    // Print edges of MST using parent array
+    for (int i = 1; i < teamlist.size(); ++i)
+    {
+        int par = parent[i];
+        if (par != -1)
+        {
+            cout << "From " << teamlist[par].getStadiumName() << " to " << teamlist[i].getStadiumName() << " " << key[i] << " miles" << endl;
+            total_mileage += key[i];
+        }
+        //printf("%d - %d\n", parent[i], i);
+    }
+    cout << "Total mileage : " << total_mileage << endl;
 }
 
 //! TeamDataStore::printAsDebug - helper function to print internal state of
@@ -293,7 +425,7 @@ bool TeamDataStore::DuplicateNumPresent(int Number)
 //! \param printcontent - print internal data of Teams
 void TeamDataStore::printAsDebug(bool printeol, bool printcontent) const
 {
-    for (std::vector<MLBTeam>::const_iterator it = list.begin(); it != list.end(); ++it)
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
         it->PrintAsDebug(printeol, printcontent);
     }
@@ -307,4 +439,120 @@ TeamDataStore::~TeamDataStore()
 
 };
 
+int TeamDataStore::PlanTrip(int from, int to)
+{
+    std::vector<MLBTeam> teamlist;
+    MLBTeam *dummyzero = new MLBTeam();
+    teamlist.push_back(*dummyzero);
+    delete dummyzero;
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        teamlist.push_back(*it);
+    }
+    // Note - this puts each team's data in the vector element that corresponds to the team number.
+    //        if the numbers are discontinuous, this will present a problem
+    sort(teamlist.begin(), teamlist.end(), Cmp_by_teamnumber());
+
+    int source_num = 999;
+    int dest_num = 999;
+    int i = 0;
+    // convert source Team number to a vector index
+    for (std::vector<MLBTeam>::const_iterator it = teamlist.begin(); it != teamlist.end(); ++it)
+    {
+        if (it->getNumber() == from)
+        {
+            source_num = i;
+        }
+        if (it->getNumber() == to)
+        {
+            dest_num = i;
+        }
+        i++;
+    }
+    if (source_num != 999 && dest_num != 999)
+    {
+        std::vector<int> min_distance(teamlist.size());
+        std::vector<int> previous(teamlist.size());
+        DijkstraComputePaths(source_num, teamlist, teamlist[from].GetDistances(), min_distance, previous, teamlist.size());
+        return min_distance[dest_num];
+    }
+    else
+    {
+        return 0; // invalid team numbers passed
+    }
+}
+
+const std::vector<TeamEdge> TeamDataStore::PlanMultTrip(int from)
+{
+    std::vector<TeamEdge> distances;
+    std::vector<MLBTeam> teamlist;
+    MLBTeam *dummyzero = new MLBTeam();
+    teamlist.push_back(*dummyzero);
+    delete dummyzero;
+    for (std::vector<MLBTeam>::const_iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
+    {
+        teamlist.push_back(*it);
+    }
+    // Note - this puts each team's data in the vector element that corresponds to the team number.
+    //        if the numbers are discontinuous, this will present a problem
+    sort(teamlist.begin(), teamlist.end(), Cmp_by_teamnumber());
+
+    int source_num = 999;
+    int dest_num = 999;
+    int i = 0;
+    // convert source Team number to a vector index
+    for (std::vector<MLBTeam>::const_iterator it = teamlist.begin(); it != teamlist.end(); ++it)
+    {
+        if (it->getNumber() == from)
+        {
+            source_num = i;
+        }
+        i++;
+    }
+    if (source_num != 999)
+    {
+        TeamEdge te(source_num,0);
+        distances.push_back(te);
+        while (source_num != 0)
+        {
+            std::vector<int> min_distance(teamlist.size());
+            std::vector<int> previous(teamlist.size());
+            int mindist = 99999;
+            int minteam = 0;
+            DijkstraComputePaths(source_num, teamlist, teamlist[from].GetDistances(), min_distance, previous, teamlist.size());
+            for (int i = 1; i < min_distance.size(); i++)
+            {
+                if (i != source_num && mindist > min_distance[i])
+                {
+                    bool found = false;
+                    for (std::vector<TeamEdge>::const_iterator it = distances.begin(); it != distances.end(); ++it)
+                    {
+                        if ((*it).m_nTeam == i)
+                        {
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                    {
+                        mindist = min_distance[i];
+                        minteam = i;
+                    }
+                }
+            }
+            if (minteam != 0)
+            {
+                TeamEdge te(minteam,mindist);
+                distances.push_back( te);
+                source_num = minteam;
+            }
+            else
+            {
+                break;  // no more entries 
+            }
+        }
+
+    }
+    return distances; // invalid team number passed
+
+}
 
