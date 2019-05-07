@@ -44,7 +44,7 @@ TeamDataStore Teams;
 int main (int argc, char *argv[])
 {
     Teams.load("./TeamData.csv");
-    //Teams.load("./TeamExpansionData.csv", true);  // verify dupes do not get loaded
+    Teams.load("./TeamExpansionData.csv", true);  // verify dupes do not get loaded
     Teams.save("./TeamData.csv.tmp");
 
 

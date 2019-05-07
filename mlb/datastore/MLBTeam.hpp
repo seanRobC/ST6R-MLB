@@ -389,7 +389,7 @@ public:
     //! \param void 
     //!
     //! \return bool - true if team deleted and should not display in UI
-    bool IsDeleted(void) const {return m_bDeleted;};
+    bool IsDeleted(void) const {return m_bDeleted || m_bInitialized;};
 
     //! SetDeleted - set team deleted status
     //!

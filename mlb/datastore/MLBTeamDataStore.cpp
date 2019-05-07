@@ -24,8 +24,7 @@ using namespace std;
 
 const int TeamDataStore::max_weight = 999999;
 TeamEdge TeamDataStore::m_DistancesArray[31+1][31+1]; // Adjacency Matrix
-//memset(TeamDataStore::m_DistancesArray, 0 sizeof(MLBTeam::m_DistancesArray));
-//std::vector<std::vector<TeamEdge>> TeamDataStore::m_DistancesArrayV;
+std::vector<std::vector<TeamEdge>> TeamDataStore::m_DistancesArrayV;
 static const int max_level = 8;
 vector<int> Levels[max_level];
 
@@ -194,6 +193,10 @@ void TeamDataStore::save(const string path)
     {
         for (std::vector<MLBTeam>::iterator it = m_TeamList.begin(); it != m_TeamList.end(); it++)
         {
+            if (!it->m_bInitialized)
+            {
+                continue;  // do not save dummy entry or incomplete Teams
+            }
             line_count++;
 
             outfile << (*it).m_nNumber << ",";
@@ -305,17 +308,12 @@ bool TeamDataStore::DuplicateNumPresent(int Number)
 
 void TeamDataStore::InitVisited(void)
 {
-    for (int team = 1; team <= m_TeamList.size(); team++)
+    for (std::vector<MLBTeam>::iterator it = m_TeamList.begin(); it != m_TeamList.end(); ++it)
     {
-        MLBTeam *pTeam = &m_TeamList[team];
-        pTeam->m_bVisited = false;
-        for (int i = 0; i < pTeam->m_Distances.size(); i++)
+        it->m_bVisited = false;
+        for (int i = 0; i < it->m_Distances.size(); i++)
         {
-            pTeam->m_Distances[i].m_bVisited = false;
-            //pTeam->m_Distances[i].discovery = false;
-            //pTeam->m_Distances[i].back = false;
-            //pTeam->m_Distances[i].forward = false;
-            //pTeam->m_Distances[i].cross = false;
+            it->m_Distances[i].m_bVisited = false;
         }
     }
 }
@@ -323,6 +321,8 @@ void TeamDataStore::InitVisited(void)
 void TeamDataStore::InitVisitedArray(void)
 {
 #if 0
+    int num_teams = m_TeamList.size();
+    m_DistancesArrayV.clear();
     for (std::vector<std::vector<TeamEdge>>::iterator it = m_DistancesArrayV.begin(); it != m_DistancesArrayV.end(); ++it)
     {
         (*it).clear();
@@ -330,13 +330,20 @@ void TeamDataStore::InitVisitedArray(void)
 
     std::vector<TeamEdge> vte;
     TeamEdge te(0,0);
-    for (int i = 0; i < 31; i++)
+    for (int i = 0; i < num_teams; i++)
     {
         m_DistancesArrayV.push_back(vte);
-        for (int j = 0; j < 31; j ++)
+        for (int j = 0; j < num_teams; j ++)
         {
             m_DistancesArrayV[i].push_back(te);
         }
+    }
+    int s1 = m_DistancesArrayV.size();
+    cout << s1 << endl;
+    for (int i = 0; i < num_teams; i++)
+    {
+        int j = m_DistancesArrayV[i].size();
+        cout << i << ":" << j << endl;
     }
 #endif
 
@@ -803,7 +810,7 @@ void TeamDataStore::BFS(const int vertice, int &total_miles)
     cout << endl << "-------- Level " << cur_level << endl;
     cout << "Starting Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
 
-    vector<int> Levels[4];
+    vector<int> Levels[max_level];
 
     Levels[0].push_back(vertice);
     while (!Levels[cur_level].empty())
