@@ -21,6 +21,7 @@
 using namespace std;
 
 typedef std::vector<TeamEdge> adjacency_list_t;
+static const int max_bfs_level = 8;
 
 //! TeamDataStore - internal storage for Team objects
 //!
@@ -173,8 +174,16 @@ public:
     //!
     //! \param vertice  - starting team
     //! \param total_miles - pointer to location to store total distance
-    void DFS(const int vertice, int &total_miles);
+    //! \param edgelist - vector containing edges used in traversal
+    //! \param thisedge_distance - distance to this vertice on edge used
+    void DFS(const int vertice, int &total_miles, std::vector<TeamEdge> &edgelist, int thisedge_distance = 0);
 
+    struct BFS_traversal
+    {
+        int team;
+        int parent;
+        int distance;
+    };
 
     //! BFS - preform a breadth first traversal starting at specified location, 
     //!       calculate total length 
@@ -183,7 +192,10 @@ public:
     //!
     //! \param vertice  - starting team
     //! \param total_miles - pointer to location to store total distance
-    void BFS(const int vertice, int &total_miles);
+    //! \param Levels - array of vectors that contain discovered team information
+    //!
+    //! \return const std::vector&lt;TeamEdge&gt; 
+    void BFS(const int vertice, int &total_miles, vector<BFS_traversal>(&Levels)[max_bfs_level]);
 
     std::vector<MLBTeam> m_TeamList;
     static const int max_weight;

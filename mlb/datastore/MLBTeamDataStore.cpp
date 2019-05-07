@@ -25,8 +25,6 @@ using namespace std;
 const int TeamDataStore::max_weight = 999999;
 TeamEdge TeamDataStore::m_DistancesArray[31+1][31+1]; // Adjacency Matrix
 std::vector<std::vector<TeamEdge>> TeamDataStore::m_DistancesArrayV;
-static const int max_level = 8;
-vector<int> Levels[max_level];
 
 //! default constuctor
 //!
@@ -741,11 +739,13 @@ const std::vector<TeamEdge> TeamDataStore::PlanShortestTrip(int from, std::vecto
 }
 
 
-void TeamDataStore::DFS(const int vertice, int &total_miles)
+void TeamDataStore::DFS(const int vertice, int &total_miles, std::vector<TeamEdge> &edgelist, int thisedge_distance)
 {
     // label v as Visited
     m_TeamList[vertice].SetVisited();
-    cout << "Visited Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
+
+    //cout << "Visited Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
+    edgelist.push_back(TeamEdge(vertice, thisedge_distance));
 
     // process the edges from this city
     //vector<CityEdge> dist = m_TeamList[vertice].GetDistances();
@@ -787,7 +787,7 @@ void TeamDataStore::DFS(const int vertice, int &total_miles)
 #if 0
             cout << "Discovery edge:" << vertice << ":::" << shortest_city << " Miles-" << shortest_dist << endl;
 #endif
-            DFS(shortest_city, total_miles);
+            DFS(shortest_city, total_miles, edgelist, shortest_dist);
         }
         else
         {
@@ -797,7 +797,7 @@ void TeamDataStore::DFS(const int vertice, int &total_miles)
     }
 }
 
-void TeamDataStore::BFS(const int vertice, int &total_miles)
+void TeamDataStore::BFS(const int vertice, int &total_miles, vector<BFS_traversal> (&Levels)[max_bfs_level])
 {
     int cur_level = 0;
     int prev_level;
@@ -807,31 +807,30 @@ void TeamDataStore::BFS(const int vertice, int &total_miles)
     // label v as Visited
     m_TeamList[vertice].SetVisited();
 
-    cout << endl << "-------- Level " << cur_level << endl;
-    cout << "Starting Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
+    //cout << endl << "-------- Level " << cur_level << endl;
+    //cout << "Starting Vertice #" << vertice << " :" << m_TeamList[vertice].getStadiumName() << endl;
 
-    vector<int> Levels[max_level];
-
-    Levels[0].push_back(vertice);
+    BFS_traversal bfst = {vertice,0,0};
+    Levels[0].push_back(bfst);
     while (!Levels[cur_level].empty())
     {
         bool vertices_discovered = false;
         prev_level = cur_level;
         cur_level++;
-        cout << endl << "-------- Level " << cur_level << endl;
-        if (cur_level >= max_level)
+        //cout << endl << "-------- Level " << cur_level << endl;
+        if (cur_level >= max_bfs_level)
         {
             // error - could have used a vector instead of a fixed size array
             cout << "======================= !!!!!!!!!!!!!!!!!! ==================" << endl;
             throw("Too many Levels");
         }
 
-        for (std::vector<int>::iterator it = Levels[prev_level].begin(); it != Levels[prev_level].end(); it++)
+        for (std::vector<BFS_traversal>::iterator it = Levels[prev_level].begin(); it != Levels[prev_level].end(); it++)
         {
             // process the edges from this city in the IncidentArray
             for (int outedge = 1; outedge <= num_teams; outedge++)
             {
-                int team_number = *it;
+                int team_number = it->team;
 #if 0
                 TeamEdge test[32];
                 for (int x = 0; x < 32; x++)
@@ -863,11 +862,14 @@ void TeamDataStore::BFS(const int vertice, int &total_miles)
                         {
                             //MLBTeam::m_DistancesArray[city_number][shortest_city].SetDiscovered();
                             m_DistancesArray[team_number][shortest_team].SetVisited();
-                            Levels[cur_level].push_back(shortest_team);
+                            bfst.team = shortest_team;
+                            bfst.parent = team_number;
+                            bfst.distance = shortest_dist;
+                            Levels[cur_level].push_back(bfst);
                             total_miles += shortest_dist;
                             vertices_discovered = true;
                             m_TeamList[shortest_team].SetVisited();
-                            cout << "Discovered Vertice #" << shortest_team << " :" << m_TeamList[shortest_team].getStadiumName() << " Parent#:" << team_number << "  Miles - " << shortest_dist << endl;
+                            //cout << "Discovered Vertice #" << shortest_team << " :" << m_TeamList[shortest_team].getStadiumName() << " Parent#:" << team_number << "  Miles - " << shortest_dist << endl;
                         }
                         else
                         {
@@ -884,7 +886,7 @@ void TeamDataStore::BFS(const int vertice, int &total_miles)
         }
         if (!vertices_discovered)
         {
-            cout << "No Undicovered Vertices Remaining" << endl;
+            //cout << "No Undicovered Vertices Remaining" << endl;
             break;  // exit - all vertices discovered in prior level
         }
     }

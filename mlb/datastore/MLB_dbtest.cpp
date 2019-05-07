@@ -374,7 +374,12 @@ int main (int argc, char *argv[])
     //Teams.FindbyNumber(4).PrintAsDebug(true,true);
     Teams.InitVisited();
     total_miles = 0;
-    Teams.DFS(4, total_miles);
+    std::vector<TeamEdge> TraversalEdges;
+    Teams.DFS(4, total_miles, TraversalEdges);
+    for (std::vector<TeamEdge>::const_iterator it = TraversalEdges.begin(); it != TraversalEdges.end(); ++it)
+    {
+        cout << "Visited Team #" << it->m_nTeam << " :" << Teams.FindbyNumber(it->m_nTeam).getStadiumName() << " - miles: " << it->m_nDistance << endl;
+    }
     cout << endl;
     cout << "Total Miles: " << total_miles;
 
@@ -382,10 +387,26 @@ int main (int argc, char *argv[])
 
     // Test Requirement: Planning Vacation 7 - BFS Starting at Coors 
     cout << "Planning Vacation 7 - BFS Starting at Coors" << endl;
-    //Teams.FindbyNumber(9).PrintAsDebug(true,true);
+    vector<TeamDataStore::BFS_traversal> Levels[max_bfs_level];
     Teams.InitVisited();
     total_miles = 0;
-    Teams.BFS(9, total_miles);
+    Teams.BFS(9, total_miles, Levels);
+
+    cout << endl << "-------- Level 0" << endl;
+    cout << "Starting Team #" << Levels[0][0].team << " :" << Teams.FindbyNumber(Levels[0][0].team).getStadiumName() << endl;
+    for (int level = 1; level < max_bfs_level; level++)
+    {
+        cout << endl << "-------- Level " << level << endl;
+        if (Levels[level].size() == 0)
+        {
+            cout << "No Undiscovered Teams Remaining" << endl;
+            break;  // exit - all vertices discovered in prior level
+        }
+        for (std::vector<TeamDataStore::BFS_traversal>::const_iterator it = Levels[level].begin(); it != Levels[level].end(); ++it)
+        {
+            cout << "Discovered Team #" << it->team << " :" << Teams.FindbyNumber(it->team).getStadiumName() << " Parent#:" << it->parent << "  Miles - " << it->distance << endl;
+        }
+    }
     cout << endl;
     cout << "Total Miles: " << total_miles;
 
